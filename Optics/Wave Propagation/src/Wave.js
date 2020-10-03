@@ -35,42 +35,41 @@ class Wave {
 		}
 	}
 
-	amplitude(c, x, t) {
-		if(c == 1 || c == 'Sinusoid') {
+	amplitude(waveType, x, t) {
+		if(waveType == 'Sinusoid') {
 			// Onde sinusoidale
 			let k = 2;
 			let w = 0.2;
 			return Math.sin(k*x - w * t);
 		}
-		else if(c == 2 || c == 'Progressive') {
+		else if(waveType == 'Progressive') {
 			// Onde progressive
 			let v = 10;
 			return 3*Math.exp(-Math.pow(x - v*t + this.offset, 2));
 		}
-		else if(c == 3 || c == 'Dispersion') {
+		else if(waveType == 'Dispersion') {
 			// Phénomène de dispersion
-				let dk = 1;
-				let dw = 5;
-				let k = 10;
-				let w = 20;
-				// return Math.cos(k/2*x-w/2*t) + Math.cos((k + dk)/2*x-(w + dw)/2*t);
-				return { a : Math.cos(dk/2*x-dw/2*t), b : Math.cos((k + dk/2)*x-(w + dw/2)*t)};
+			let dk = 1;
+			let dw = 5;
+			let k = 10;
+			let w = 20;
+			// return Math.cos(k/2*x-w/2*t) + Math.cos((k + dk)/2*x-(w + dw)/2*t);
+			return { a : Math.cos(dk/2*x-dw/2*t), b : Math.cos((k + dk/2)*x-(w + dw/2)*t)};
 		}
-		else if(c == 4 || c == 'Stationary') {
+		else if(waveType == 'Stationary') {
 			// Stationnaire
-			//t = 0;
 			let k = 2;
 			let w = 2;
 			return { a: Math.sin(k*x - w*t), b : Math.sin(k*x + w*t), c : 2 * Math.cos(w*t) * Math.cos(k*x) };
 		}
-		else if(c == 5 || c == 'Beat') {
+		else if(waveType == 'Beat') {
 			// Battements
-			// let v1 = 0.1;
-			// let v2 = 1.2;
+			let v1 = 0.1;
+			let v2 = 1.2;
 			let k = 10;
 			return Math.cos(k*x) * Math.cos((v1 + v2) * 2*Math.PI*t);
 		}
-		else if(c == 6 || c == 'Modulated') {
+		else if(waveType == 'Modulated') {
 			// Signal modulé
 			let v1 = 0.1;
 			let v2 = 1.2;
