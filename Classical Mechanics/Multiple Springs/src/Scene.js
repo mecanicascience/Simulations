@@ -1,5 +1,13 @@
 class Scene {
-    constructor(systemPointsNumber, l0, q, m, k, drawParticleRadius) {
+    constructor(mode, options) {
+        this.datas = {
+            points : []
+        };
+        this.mode    = mode;
+        this.options = options;
+
+        let systemPointsNumber = options.parameters.systemPointsNumber;
+
         this.staticPoints = [
             {
                 pos  : new Vector(0, 0),
@@ -24,7 +32,11 @@ class Scene {
         // generate springs
         for (let i = 0; i < systemPointsNumber; i++)
             this.springs.push(
-                new Spring(null, null, new Vector((16-1) / systemPointsNumber * i + 1, 0), l0, q, m, k, drawParticleRadius)
+                new Spring(
+                    null, null, new Vector((16-1) / systemPointsNumber * i + 1, 0),
+                    options.constants.l0, options.constants.q, options.constants.m, options.constants.k,
+                    options.parameters.drawParticleRadius
+                )
             );
 
         // attach springs to each other
@@ -49,15 +61,39 @@ class Scene {
 
         for (let i = 0; i < this.springs.length; i++)
             this.springs[i].update(dt);
+
+        if (this.mode == 'plot') {
+            let N = Math.round(params.configuration.Graduation);
+            let val = this.springs[this.options.plot.particle_id];
+
+            this.datas.points.push({
+                xRaw : this.datas.points.length,
+                x : this.datas.points.length / N - 2,
+                y : this.springs
+                    [this.options.plot.particle_id]
+                    [this.options.plot.parameters.type]
+                    [this.options.plot.parameters.coordinate]
+            });
+        }
     }
 
     draw(drawer) {
-        for (let i = 0; i < this.springs.length; i++)
-            this.springs[i].draw(drawer);
+        if (this.mode == 'animation') {
+            for (let i = 0; i < this.springs.length; i++)
+                this.springs[i].draw(drawer);
 
-        drawer.noStroke().fill(170, 170, 170);
+            drawer.noStroke().fill(170, 170, 170);
 
-        for (let i = 0; i < this.staticPoints.length; i++)
-            drawer.circle(this.staticPoints[i].pos.x, this.staticPoints[i].pos.y, this.staticPoints[i].drawRadius);
+            for (let i = 0; i < this.staticPoints.length; i++)
+                drawer.circle(this.staticPoints[i].pos.x, this.staticPoints[i].pos.y, this.staticPoints[i].drawRadius);
+        }
+        else if (this.mode == 'plot') {
+            drawer.noFill().stroke(255).strokeWeight(3);
+            for (let i = 1; i < this.datas.points.length; i++)
+                drawer.line(
+                    this.datas.points[i - 1].x, this.datas.points[i - 1].y,
+                    this.datas.points[i].x, this.datas.points[i].y
+                );
+        }
     }
 }
