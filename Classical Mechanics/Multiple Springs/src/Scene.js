@@ -1,13 +1,8 @@
 class Scene {
     constructor(mode, options) {
-        this.datas = {
-            points : []
-        };
-        this.mode    = mode;
-        this.options = options;
-
-        let systemPointsNumber = options.parameters.systemPointsNumber;
-
+        this.mode         = mode;
+        this.options      = options;
+        this.springs      = [];
         this.staticPoints = [
             {
                 pos  : new Vector(0, 0),
@@ -23,11 +18,18 @@ class Scene {
             }
         ];
 
-        this.springs = [];
-
-        if (systemPointsNumber <= 1) {
-            console.error("You need to simulate at least 2 points");
+        if (this.mode == 'plot') {
+            if (this.options.plot.parameters.type == 'pos' && this.options.plot.parameters.coordinate == 'x')
+                this.plotter = new PointsPlotter(10, 10, 10, 8);
+            else
+                this.plotter = new PointsPlotter(10, 10, 10, 0);
         }
+
+
+
+        let systemPointsNumber = options.parameters.systemPointsNumber;
+        if (systemPointsNumber <= 1)
+            console.error("You need to simulate at least 2 points");
 
         // generate springs
         for (let i = 0; i < systemPointsNumber; i++)
@@ -52,7 +54,10 @@ class Scene {
         }
 
         // initial impact
-        this.springs[0].pos.y = -3;
+        if (options.parameters.lockOnX)
+            this.springs[0].pos.x = 1;
+        else
+            this.springs[0].pos.y = -2;
     }
 
     update(dt) {
@@ -62,19 +67,11 @@ class Scene {
         for (let i = 0; i < this.springs.length; i++)
             this.springs[i].update(dt);
 
-        if (this.mode == 'plot') {
-            let N = Math.round(params.configuration.Graduation);
-            let val = this.springs[this.options.plot.particle_id];
-
-            this.datas.points.push({
-                xRaw : this.datas.points.length,
-                x : this.datas.points.length / N - 2,
-                y : this.springs
-                    [this.options.plot.particle_id]
-                    [this.options.plot.parameters.type]
-                    [this.options.plot.parameters.coordinate]
-            });
-        }
+        if (this.mode == 'plot')
+            this.plotter.addPoint(this.springs
+                [this.options.plot.particle_id]
+                [this.options.plot.parameters.type]
+                [this.options.plot.parameters.coordinate]);
     }
 
     draw(drawer) {
@@ -87,13 +84,7 @@ class Scene {
             for (let i = 0; i < this.staticPoints.length; i++)
                 drawer.circle(this.staticPoints[i].pos.x, this.staticPoints[i].pos.y, this.staticPoints[i].drawRadius);
         }
-        else if (this.mode == 'plot') {
-            drawer.noFill().stroke(255).strokeWeight(3);
-            for (let i = 1; i < this.datas.points.length; i++)
-                drawer.line(
-                    this.datas.points[i - 1].x, this.datas.points[i - 1].y,
-                    this.datas.points[i].x, this.datas.points[i].y
-                );
-        }
+        else if (this.mode == 'plot')
+            this.plotter.draw(drawer);
     }
 }
