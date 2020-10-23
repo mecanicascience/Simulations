@@ -47,6 +47,7 @@ const params = {
 		 Mode : 0
 	},
 	configuration : {
+		'Particle n = ' : 1,
 		'Graduation' : 10,
 		'Données'    : 0,
 		'Coordonnée' : 0
@@ -75,6 +76,14 @@ function setupGUI() {
 		});
 
 	options_folder
+		.addInput(params.configuration, 'Particle n = ')
+		.on('change', (value) => {
+			options.plot.particle_id = parseInt(value);
+			console.log(value);
+			resetScene();
+		});
+
+	options_folder
 		.addInput(params.configuration, 'Données', { options: { position : 0, vitesse : 1, 'accélération' : 2 } })
 		.on('change', (value) => {
 			options.plot.parameters.type = value == 2 ? 'acc' : (value ? 'vel' : 'pos');
@@ -93,6 +102,7 @@ function setupGUI() {
 		.on('change', (value) => {
 			_pSimulationInstance.plotter.objectsL[0].plotter.resize(Math.round(value), null, Math.round(value), null);
 		});
+
 
 
 	// OPTIONS CONSTANTES
