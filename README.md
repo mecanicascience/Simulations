@@ -9,12 +9,12 @@ The exact method used depends on the simulation: in general, it is Euler with th
 
 The simulations will look something like this:
 
-![A](https://imgur.com/HWpPtds)
+![A](https://i.imgur.com/kEIvZDb.png)
 
 All you have to do is play around with the value sliders and checkboxes in the upper-right corner.
 
 ## Images
 
-![B](https://imgur.com/FHUP8Yr)
-![C](https://imgur.com/YheNP55)
-![D](https://imgur.com/pJJ5jYS)
+![B](https://i.imgur.com/5wXLE5M.png)
+![C](https://i.imgur.com/vEeAehm.png)
+![D](https://i.imgur.com/pPdT8td.png)
