@@ -1,9 +1,9 @@
 # Simulations
-Repository containing all the simulations published on https://www.mecanicascience.fr/simulations/list/.
+Repository containing all the simulations published on [MecanicaScience](https://www.mecanicascience.fr/simulations/list/).
 
 ## Simulation tools
 
-The exact method used depends on the simulation; in general, it is Euler with the exact formulas from the problem, if there are forces involved. Code is written with [PSEngine](https://github.com/mecanicascience/PhysicsSimulationEngine).
+The exact method used depends on the simulation: in general, it is Euler with the exact formulas from the problem, if there are forces involved. Code is written with [PSEngine](https://github.com/mecanicascience/PhysicsSimulationEngine).
 
 ## Use
 
