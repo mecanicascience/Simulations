@@ -1,10 +1,12 @@
-let z = 20;
-
 function runSimulator(simulator) {
+    let z = 20;
+
     simulator
         .setEngineConfig((eC) => {
-            eC.plotter.scale = { x : z, y: z };
-            eC.plotter.displayGrid = false;
+            eC.plotter.scale  = { x : z, y : z };
+            eC.plotter.offset = { x : z, y : 0 };
+            // eC.plotter.displayGrid = true;
+            eC.plotter.squareByX = true;
         })
-        .addObjects(Wave, 1);
+        .addObjects(Grapher, 1);
 }

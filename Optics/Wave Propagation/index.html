@@ -2,7 +2,7 @@
 <html lang="fr">
     <head>
         <meta charset="utf-8">
-        <title>Wave propagation</title>
+        <title>Waves</title>
 
         <style>
             body {
@@ -15,14 +15,38 @@
             #simulationContent {
                 text-align: center;
             }
+
+            .folder-name-tex {
+                width: max-content;
+            }
+
+            .tp-rotv {
+                font-size: 14px !important;
+            }
 		</style>
 
 
         <script type="text/javascript" src="src/sketch.js"></script>
+
         <script type="text/javascript" src="src/Wave.js"></script>
+        <script type="text/javascript" src="src/Grapher.js"></script>
+        <script type="text/javascript" src="src/OptionsGUI.js"></script>
+
+        <script type="text/javascript" src="src/types/ParticlesWaveTemplate.js"></script>
+        <script type="text/javascript" src="src/types/AmplitudeWaveTemplate.js"></script>
+        <script type="text/javascript" src="src/types/GridWaveTemplate.js"></script>
+
+        <script type="text/javascript" src="src/waves/plane/HarmonicPlaneWave1D.js"></script>
+        <script type="text/javascript" src="src/waves/plane/HarmonicPlaneWave2D.js"></script>
+        <script type="text/javascript" src="src/waves/plane/ColorPlaneWave2D.js"></script>
+
+        <script type="text/javascript" src="src/waves/circular/ColorCircularWave2D.js"></script>
+
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
-        <script src="https://mecanicascience.github.io/PhysicsSimulationEngine/versions/1.3.4/pSEngine.min.js"></script>
+		<script src="https://psengine.mecanicascience.fr/versions/3.1.0/pSEngine.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/tweakpane@1.5.5/dist/tweakpane.min.js"></script>
     </head>
 
     <body>
