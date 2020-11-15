@@ -32,6 +32,6 @@ class GridWaveTemplate extends Wave {
             val = 1;
 
         let v = Math.round(val * 127.5 + 127.5);
-        return `rgba(${v}, ${v}, ${v}, 1)`;
+        return `rgba(${255-v}, ${255-v}, ${255-v}, 1)`;
     }
 }
