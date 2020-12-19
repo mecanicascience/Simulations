@@ -1,17 +1,23 @@
 class Grapher {
     constructor() {
         this.configGUI();
-        this.waves = [ new ColorCircularWave2D(this.optionsGUI) ];
+        this.wave = new ColorCircularWave2D(this.optionsGUI);
+
+        window.onclick = function() {
+            let mousePos = _pSimulationInstance.plotter.computeForXYFromPixel(mouseX, mouseY)
+                .sub(
+                    _pSimulationInstance.config.engine.plotter.offset.x,
+                    _pSimulationInstance.config.engine.plotter.offset.y
+                );
+        };
     }
 
     update(dt) {
-        for (let i = 0; i < this.waves.length; i++)
-            this.waves[i].update(dt);
+        this.wave.update(dt);
     }
 
     draw(drawer) {
-        for (let i = 0; i < this.waves.length; i++)
-            this.waves[i].draw(drawer);
+        this.wave.draw(drawer);
     }
 
 
@@ -43,11 +49,11 @@ class Grapher {
         document.getElementsByClassName('tp-dfwv')[document.getElementsByClassName('tp-dfwv').length - 2].innerHTML = '';
 
         if (val == 0)
-            this.waves = [ new HarmonicPlaneWave1D(this.optionsGUI) ];
+            this.wave = new HarmonicPlaneWave1D(this.optionsGUI);
         else if (val == 1)
-            this.waves = [ new HarmonicPlaneWave2D(this.optionsGUI) ];
+            this.wave = new HarmonicPlaneWave2D(this.optionsGUI);
         else
-            this.waves = [ new ColorPlaneWave2D(this.optionsGUI) ];
+            this.wave = new ColorPlaneWave2D(this.optionsGUI);
     }
 
     setupWaveCircular() {
@@ -57,6 +63,6 @@ class Grapher {
         document.getElementsByClassName('tp-dfwv')[document.getElementsByClassName('tp-dfwv').length - 2].innerHTML = '';
 
         if (val == 0)
-            this.waves = [ new ColorCircularWave2D(this.optionsGUI) ];
+            this.wave = new ColorCircularWave2D(this.optionsGUI);
     }
 }

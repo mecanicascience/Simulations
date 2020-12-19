@@ -9,4 +9,6 @@ function runSimulator(simulator) {
             eC.plotter.squareByX = true;
         })
         .addObjects(Grapher, 1);
+
+    pixelDensity(1);
 }
