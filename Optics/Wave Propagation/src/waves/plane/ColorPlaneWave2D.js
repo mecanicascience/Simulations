@@ -1,6 +1,6 @@
 class ColorPlaneWave2D extends GridWaveTemplate {
     constructor(o) {
-        super(50);
+        super(200);
 
         this.omega     = o.addInput('\\omega', 10, -20, 20);
         this.phi0      = o.addInput('\\varphi_0', 0, -5, 5);

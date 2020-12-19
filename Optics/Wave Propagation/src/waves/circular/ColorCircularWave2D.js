@@ -1,12 +1,12 @@
 class ColorCircularWave2D extends GridWaveTemplate {
     constructor(o) {
-        super(50);
+        super(200);
 
         this.omega      = o.addInput('\\omega', 5, -20, 20);
         this.phi0       = o.addInput('\\varphi_0', 0, -5, 5);
         this.amplitude  = o.addInput('\\text{Amplitude}', 1, -10, 10);
         this.k          = o.addInput('k', 2.5, -5, 5);
-        this.waveCenter = o.addVector('\\text{Wave center } M_O', [0, 0], [-20, -20], [20, 20])
+        this.waveCenter = o.addVector('\\text{Wave center } M_O', [0, 0], [-20, -20], [20, 20]);
     }
 
     getNormalizedAmplitude(r, t) {

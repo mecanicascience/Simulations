@@ -1,15 +1,17 @@
 class Grapher {
     constructor() {
         this.configGUI();
-        this.wave = new ColorCircularWave2D(this.optionsGUI);
+        this.waves = [ new ColorCircularWave2D(this.optionsGUI) ];
     }
 
     update(dt) {
-        this.wave.update(dt);
+        for (let i = 0; i < this.waves.length; i++)
+            this.waves[i].update(dt);
     }
 
     draw(drawer) {
-        this.wave.draw(drawer);
+        for (let i = 0; i < this.waves.length; i++)
+            this.waves[i].draw(drawer);
     }
 
 
@@ -41,11 +43,11 @@ class Grapher {
         document.getElementsByClassName('tp-dfwv')[document.getElementsByClassName('tp-dfwv').length - 2].innerHTML = '';
 
         if (val == 0)
-            this.wave = new HarmonicPlaneWave1D(this.optionsGUI);
+            this.waves = [ new HarmonicPlaneWave1D(this.optionsGUI) ];
         else if (val == 1)
-            this.wave = new HarmonicPlaneWave2D(this.optionsGUI);
+            this.waves = [ new HarmonicPlaneWave2D(this.optionsGUI) ];
         else
-            this.wave = new ColorPlaneWave2D(this.optionsGUI);
+            this.waves = [ new ColorPlaneWave2D(this.optionsGUI) ];
     }
 
     setupWaveCircular() {
@@ -55,6 +57,6 @@ class Grapher {
         document.getElementsByClassName('tp-dfwv')[document.getElementsByClassName('tp-dfwv').length - 2].innerHTML = '';
 
         if (val == 0)
-            this.wave = new ColorCircularWave2D(this.optionsGUI);
+            this.waves = [ new ColorCircularWave2D(this.optionsGUI) ];
     }
 }
