@@ -4,3 +4,6 @@
 [submodule "2020/ElectrostaticFields"]
 	path = 2020/ElectrostaticFields
 	url = https://github.com/xam4lor/ElectromagnetismFields
+[submodule "2021/LanderSimulation"]
+	path = 2021/LanderSimulation
+	url = https://github.com/mecanicascience/Lander-Simulation
