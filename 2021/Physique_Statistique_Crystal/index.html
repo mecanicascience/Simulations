@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Statistical Physics</title>
+
+		<style>
+			body {
+				margin: 0;
+				/* background-color: black !important; */
+                background-color: black;
+				color: white;
+                font-size: 20px;
+			}
+
+			#simulationContent {
+				text-align: center;
+			}
+
+            #simulationCanvas {
+                display: none;
+            }
+
+            #simulation_title {
+                margin-top: 30px;
+                font-size: 25px;
+            }
+
+            #drawingCanvas {
+                width: 300px;
+                height: 300px;
+            }
+
+            .bufferInfo {
+                flex-grow: 1;
+            }
+            
+            .bufferInfo > img {
+                width: 280px;
+                height: 280px;
+            }
+		</style>
+
+        <script id="frag_shader" type="text/javascript">
+            const fragShaderSource = `#version 300 es
+                precision highp float;
+
+                // Uniform data
+                uniform vec2 iResolution;
+                uniform float iDeltaTime;
+                uniform float iSizeFactor;
+
+                uniform float uMass;
+                uniform float uGravity;
+                uniform float uRadius;
+                uniform float uCollisionFactor;
+
+
+                // Uniform pos and vel data
+                uniform sampler2D inPosData;
+                uniform sampler2D inVelData;
+
+                // Output values
+                layout(location = 0) out vec4 outPos;
+                layout(location = 1) out vec4 outVel;
+                layout(location = 2) out vec4 outPressure;
+                layout(location = 3) out vec4 outEnergy;
+
+                void main() {
+                    // Normalized pixel coordinates (from 0 to 1) - gl_FragCoord ((0.5, 0.5) - (width + 0.5, height + 0.5))
+                    vec2 uv = gl_FragCoord.xy / iResolution.xy;
+
+                    // Constants
+                    float mass = uMass;
+                    float g = uGravity;
+                    float radius = uRadius;
+                    float collisionKFactor = uCollisionFactor;
+
+                    // Input data
+                    vec2 inPos = texture(inPosData, uv).xy;
+                    vec2 inVel = texture(inVelData, uv).xy;
+
+                    // Output particles data
+                    float pressure = 0.0; // P = dF/dS = m.v^2/dt / dS
+                    float energy = 0.5 * mass * abs(inVel.x * inVel.x + inVel.y * inVel.y); // E = 1/2.m.v^2
+
+
+                    // Avoid wall collision (collision => pressure)
+                    bool collided = false;
+                    float deltaSurface = 3.14 * radius*radius;
+                    if (inPos.x + radius + inVel.x * iDeltaTime > 1.0 * iSizeFactor || inPos.x - radius + inVel.x * iDeltaTime < -1.0 * iSizeFactor) {
+                        inVel.x *= -1.0;
+                        pressure = mass * (inVel.x * inVel.x) / iDeltaTime / deltaSurface;
+                    }
+                    if (inPos.y + radius + inVel.y * iDeltaTime > 1.0 * iSizeFactor || inPos.y - radius + inVel.y * iDeltaTime < -1.0 * iSizeFactor) {
+                        inVel.y *= -1.0;
+                        pressure = mass * (inVel.y * inVel.y) / iDeltaTime / deltaSurface;
+                    }
+
+
+                    // Compute acceleration
+                    vec2 acceleration = vec2(0.0, 0.0);
+                    //acceleration += vec2(0.0, g * mass); // gravity
+                    
+                    // Collision with other particles
+                    for (float i = 0.5; i < iResolution.x + 0.5; i++) {
+                        for (float j = 0.5; j < iResolution.y + 0.5; j++) {
+                            vec2 uv2 = vec2(i, j) / iResolution.xy;
+
+                            // Do not compute interactions with the same particle
+                            if (i == gl_FragCoord.x && j == gl_FragCoord.y)
+                                continue;
+
+                            // Other particle position and velocity
+                            vec2 inPos2 = texture(inPosData, uv2).xy;
+                            vec2 inVel2 = texture(inVelData, uv2).xy;
+
+                            // Compute distance
+                            float dist = sqrt(
+                                  pow(inPos.x + inVel.x * iDeltaTime - inPos2.x + inVel2.x * iDeltaTime, 2.0)
+                                + pow(inPos.y + inVel.y * iDeltaTime - inPos2.y + inVel2.y * iDeltaTime, 2.0)
+                            );
+
+                            // Collision in 1/r^2
+                            float minDist = radius * 0.01;
+                            float dst = max(pow(dist, 2.0), minDist);
+                            acceleration += -collisionKFactor * 1.0 / dst * normalize(inPos2 - inPos);
+                        }
+                    }
+
+                    // Compute new position and velocity
+                    vec2 newPos = vec2(inPos.x + inVel.x * iDeltaTime, inPos.y + inVel.y * iDeltaTime);
+                    vec2 newVel = vec2(inVel.x + acceleration.x * iDeltaTime / mass, inVel.y + acceleration.y * iDeltaTime / mass);
+
+                    // Update position and velocity of the particle
+                    outPos = vec4(newPos.x, newPos.y, 0.0, 1.0);
+                    outVel = vec4(newVel.x, newVel.y, 0.0, 1.0);
+
+                    // Update data fields
+                    outPressure = vec4(pressure, 0.0, 0.0, 1.0);
+                    outEnergy   = vec4(energy / 10.0, 0.0, 0.0, 1.0);
+                }
+            `;
+        </script>
+
+        <script id="vert_shader" type="text/javascript">
+            const vertShaderSource = `#version 300 es
+                layout(location = 0) in vec2 aPos;
+
+                void main() {
+                    gl_Position = vec4(aPos, 0.0, 1.0);
+                }
+            `;
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+		<script src="src/sketch.js"></script>
+		<script src="src/Plotter.js"></script>
+        <script src="src/WebGLHelper.js"></script>
+	</head>
+
+	<body>
+		<div id="simulationContent">
+            <div>
+                <div id="simulation_title"></div><div id="FPS_count"></div><br />
+                <canvas id="simulationCanvas" width="600" height="600"></canvas>
+                <canvas id="drawingCanvas" width="600" height="600"></canvas>
+                <p>Simulation data : Frame id : <span id="frameID">0</span> - Frame count <span id="frameCount">0</span></p>
+
+                <div id="buttons_area">
+                    <input type="button" onclick="loop()" value="Start"></input>
+                    <input type="button" onclick="noLoop()" value="Pause"></input>
+                    <input type="button" onclick="plotter.stepMode = true; plotter.noLoop = false;" value="Step"></input>
+                </div>
+            </div>
+
+            <br />
+
+            <div style="display: flex;">
+                <div class="bufferInfo" style="max-width: 50%;">Pressure Graph <br /><canvas id="pressureGraph"></canvas></div>
+                <div class="bufferInfo" style="max-width: 50%;">Energy Graph <br /><canvas id="energyGraph"></canvas></div>
+            </div>
+
+            <br /><br /><br /><br />
+
+            <div style="display: flex;">
+                <div class="bufferInfo">Pressure - <span id="buffer0_attachment2_frame">Frame 0</span><br /><img id="buffer0_attachment2" /></div><br />
+                <div class="bufferInfo">Energy -   <span id="buffer0_attachment3_frame">Frame 0</span><br /><img id="buffer0_attachment3" /></div><br />
+            </div>
+
+            <br />
+
+            <div style="display: flex;">
+                <div class="bufferInfo">Buffer 0, Attachment 0 - <span id="buffer0_attachment0_frame">Frame 0</span><br /><img id="buffer0_attachment0" /></div><br />
+                <div class="bufferInfo">Buffer 0, Attachment 1 - <span id="buffer0_attachment1_frame">Frame 0</span><br /><img id="buffer0_attachment1" /></div><br />
+                <div class="bufferInfo">Buffer 1, Attachment 0 - <span id="buffer1_attachment0_frame">Frame 0</span><br /><img id="buffer1_attachment0" /></div><br />
+                <div class="bufferInfo">Buffer 1, Attachment 1 - <span id="buffer1_attachment1_frame">Frame 0</span><br /><img id="buffer1_attachment1" /></div><br />
+            </div>
+
+            <br />
+		</div>
+	</body>
+</html>

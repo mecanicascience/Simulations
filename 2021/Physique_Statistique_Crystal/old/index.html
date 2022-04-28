@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Statistical Physics</title>
+
+		<style>
+			body {
+				margin: 0;
+				background-color: black !important;
+				color: white;
+				overflow: hidden;
+			}
+
+			#simulationContent {
+				text-align: center;
+			}
+
+			#defaultCanvas0 {
+				display: none;
+			}
+		</style>
+
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+		<script type="text/javascript" src="https://mecanicascience.github.io/PhysicsSimulationEngine/versions/2.2.1/pSEngine.min.js"></script>
+
+		<script src="src/sketch.js"></script>
+		<script src="src/Plotter.js"></script>
+	</head>
+
+	<body>
+		<div id="simulationContent">
+			<canvas id="test" width="800" height="600"></canvas>
+			<canvas id="test2"></canvas>
+		</div>
+	</body>
+</html>

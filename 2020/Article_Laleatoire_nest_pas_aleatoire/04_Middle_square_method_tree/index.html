@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Middle Square Method Tree</title>
+
+		<style>
+			body {
+				margin: 0;
+				background-color: black !important;
+				color: white;
+				overflow: hidden;
+			}
+
+			#simulationContent {
+				text-align: center;
+			}
+
+			.buttons {
+				position: absolute;
+				left: 50%;
+				top: 10%;
+				color: white !important;
+				font-size: 57px !important;
+				text-transform: uppercase;
+				font-weight: 800 !important;
+				font-family: 'Railway', 'Montserrat', Arial;
+				text-align: center;
+				width: 70%;
+				transition: opacity 0.5s ease;
+			}
+			.buttons > div {
+				position: relative;
+				left: -50%;
+			}
+			.buttons > div > input {
+				border-radius: 7px;
+				margin: 27px 0 20px 0;
+				text-align: center;
+			}
+
+			@media screen and (max-width: 1220px) {
+				.buttons { font-size: 35px !important; }
+			}
+
+			@media screen and (max-width: 750px) {
+				.buttons { font-size: 21px !important; }
+			}
+		</style>
+
+		<script>
+			function confirm() {
+				let val = parseInt(document.getElementById('nb-input').value);
+
+				if(val >= 0 && val <= 99 && !isNaN(val)) {
+					document.getElementById('buttons').style.opacity = 0;
+					setTimeout(() => {
+						_pSimulationInstance.plotter.objectsL[0].startSimulation(parseInt(val));
+					}, 500);
+				}
+				else {
+					document.getElementById('nb-input').value = '';
+					document.getElementById('nb-button').className = "btn btn-outline-danger";
+					setTimeout(() => {
+						document.getElementById('nb-button').className = "btn btn-outline-light";
+					}, 1500);
+				}
+			}
+		</script>
+
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+		<script type="text/javascript" src="https://mecanicascience.github.io/PhysicsSimulationEngine/versions/2.2.1/pSEngine.min.js"></script>
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+
+		<script src="src/sketch.js"></script>
+		<script src="src/MSMT.js"></script>
+		<script src="src/Bubble.js"></script>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<div class="buttons" id="buttons">
+			<div>
+				<div>Entrez votre seed<br />(nombre entre 00 et 99)</div>
+				<input type="number" id="nb-input" placeholder="..." /><br />
+				<button type="button" id="nb-button" class="btn btn-outline-light" style="font-size: 34px;" onclick="confirm()">Valider</button>
+			</div>
+		</div>
+
+		<div id="simulationContent">
+		</div>
+	</body>
+</html>

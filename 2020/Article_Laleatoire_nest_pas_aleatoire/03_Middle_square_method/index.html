@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Middle Square Method</title>
+
+		<style>
+			body {
+				margin: 0;
+				background-color: black !important;
+				color: white;
+				overflow: hidden;
+			}
+
+			#simulationContent {
+				text-align: center;
+			}
+
+			.buttons {
+				position: absolute;
+				left: 50%;
+				top: 10%;
+				color: white !important;
+				font-size: 57px !important;
+				text-transform: uppercase;
+				font-weight: 800 !important;
+				font-family: 'Railway', 'Montserrat', Arial;
+				text-align: center;
+				width: 70%;
+				transition: opacity 0.5s ease;
+			}
+			.buttons > div {
+				position: relative;
+				left: -50%;
+			}
+			.buttons > div > input {
+				border-radius: 7px;
+				margin: 27px 0 20px 0;
+				text-align: center;
+			}
+
+			.nb-shown {
+				text-align: center;
+				border-radius: 10px;
+				margin-top: 50px;
+				font-size: 150px;
+			}
+			.nb-shown-bis {
+				text-align: center;
+				border-radius: 10px;
+				margin-top: -225px;
+				font-size: 150px;
+			}
+
+			.nb-title {
+				text-align: center;
+				margin-top: -39px;
+				font-size: 47px;
+				font-weight: 400;
+			}
+
+			.nb-square {
+				text-align: center;
+				border-radius: 10px;
+				margin-top: -230px;
+				margin-left: 250px;
+				font-size: 70px;
+				font-weight: 400;
+				color: #aaa;
+			}
+
+			.nb-underline {
+				text-align: center;
+			    border-radius: 10px;
+			    margin-top: 92px;
+				margin-left: auto;
+				margin-right: auto;
+			    font-size: 70px;
+			    font-weight: 400;
+			    width: 207px;
+			    height: 10px;
+			    background-color: #acaaaa;
+			}
+
+			.nb-underline-1,
+			.nb-underline-2 {
+				margin-left: auto;
+				margin-right: auto;
+				width: 10px;
+			    height: 15px;
+			}
+
+			.nb-underline-1 > div {
+				text-align: center;
+			    border-radius: 10px;
+			    margin-top: -16px;
+			    font-size: 70px;
+			    font-weight: 400;
+			    width: 10px;
+			    height: 15px;
+			    background-color: #acaaaa;
+				margin-left: -99px;
+			}
+
+			.nb-underline-2 > div {
+				text-align: center;
+			    border-radius: 10px;
+			    margin-top: -16px;
+			    font-size: 70px;
+			    font-weight: 400;
+			    width: 10px;
+			    height: 15px;
+			    background-color: #acaaaa;
+				margin-left: 98px;
+			}
+
+			@media screen and (max-width: 590px) {
+				#nb-title { font-size: 35px !important; }
+				.buttons > div > div { font-size: 110px !important; }
+				.nb-shown-bis {
+					margin-top: -166px;
+					width: inherit !important;
+				}
+				.nb-underline { margin-top: 36px; }
+			}
+		</style>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+		<script src="https://mecanicascience.github.io/PhysicsSimulationEngine/versions/2.1.1/pSEngine.min.js"></script>
+
+		<script src="src/sketch.js"></script>
+		<script src="src/MSM.js"></script>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<div class="buttons" id="buttons">
+			<div>
+				<div id="nb-title"       class="nb-title">Itération 1</div>
+				<div id="nb-shown"       class="nb-shown">00</div>
+				<div id="nb-shown-bis"   class="nb-shown-bis" style="opacity: 0;">00</div>
+				<div id="nb-square"      class="nb-square"    style="opacity: 0">2</div>
+				<div id="nb-underline"   class="nb-underline" style="opacity: 0"></div>
+				<div id="nb-underline-1" class="nb-underline-1"><div></div></div>
+				<div id="nb-underline-2" class="nb-underline-2"><div></div></div>
+			</div>
+		</div>
+
+		<div id="simulationContent">
+		</div>
+	</body>
+</html>

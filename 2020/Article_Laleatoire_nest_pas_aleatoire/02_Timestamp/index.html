@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>Timestamp actuel</title>
+
+		<style>
+			body {
+				margin: 0;
+				background-color: black !important;
+				color: white;
+				overflow: hidden;
+			}
+
+			#simulationContent {
+				text-align: center;
+			}
+
+			.buttons {
+				position: absolute;
+				left: 50%;
+				top: 10%;
+				color: white !important;
+				font-size: 57px !important;
+				text-transform: uppercase;
+				font-weight: 800 !important;
+				font-family: 'Railway', 'Montserrat', Arial;
+				text-align: center;
+				width: 70%;
+				transition: opacity 0.5s ease;
+			}
+			.buttons > div {
+				position: relative;
+				left: -50%;
+			}
+			.buttons > div > input {
+				border-radius: 7px;
+				margin: 27px 0 20px 0;
+				text-align: center;
+			}
+
+			.nb-timestamp {
+				color: black;
+				background-color: white;
+				text-align: center;
+				border-radius: 10px;
+				margin-top: 30px;
+			}
+
+			@media screen and (max-width: 750px) {
+				.buttons {
+					font-size: 28px !important;
+					width: 100% !important;
+				}
+			}
+		</style>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+		<script src="https://mecanicascience.github.io/PhysicsSimulationEngine/versions/2.1.1/pSEngine.min.js"></script>
+
+		<script src="src/sketch.js"></script>
+		<script src="src/Plotter.js"></script>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous">
+	</head>
+
+	<body>
+		<div class="buttons" id="buttons">
+			<div>
+				<div>TIMESTAMP ACTUEL</div>
+				<div id="nb-timestamp" class="nb-timestamp" /></div>
+			</div>
+		</div>
+
+		<div id="simulationContent">
+		</div>
+	</body>
+</html>
