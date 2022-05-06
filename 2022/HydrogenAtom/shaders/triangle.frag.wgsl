@@ -42,7 +42,7 @@ fn factorial(x : i32) -> i32 {
 
     // Compute factorial
     var fac = 1;
-    for(var i: i32 = 2; i <= x; i++) {
+    for(var i: i32 = 2; i <= x; i = i + 1) {
         fac = fac * i;
     }
     return fac;
@@ -146,7 +146,7 @@ fn Y(theta : f32, phi : f32, l : i32, m : i32) -> f32 {
 fn laguerreGeneralises(x : f32, n : i32, l : i32) -> f32 {
     var val = 0.0;
 
-    for(var i: i32 = 0; i <= n - l - 1; i++) {
+    for(var i: i32 = 0; i <= n - l - 1; i = i + 1) {
         var sign = -1.0;
         if (i % 2 == 0) {
             sign = 1.0;
@@ -219,7 +219,7 @@ fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
     // Sum over each planes
     var proba = 0.0;
     var color = vec3<f32>(0.0, 0.0, 0.0);
-    for (var i: i32 = 0; i < RES_PLANE_COUNTS; i++) {
+    for (var i: i32 = 0; i < RES_PLANE_COUNTS; i = i + 1) {
         // Pos
         let relPos = iPos + vecToCenter * sqrt(iPos.x*iPos.x + iPos.y*iPos.y + iPos.z*iPos.z) // shift to center
                     + vecToCenter * (f32(i) / f32(RES_PLANE_COUNTS) * f32(RES_PLANE_AREA * 2) - f32(RES_PLANE_AREA));

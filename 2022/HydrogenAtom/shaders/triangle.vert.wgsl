@@ -1,6 +1,6 @@
 struct VSOut {
-    @builtin(position) position: vec4<f32>,
-    @location(0) pos: vec2<f32>
+    @builtin(position) position: vec4<f32>;
+    @location(0) pos: vec2<f32>;
 };
 
 
