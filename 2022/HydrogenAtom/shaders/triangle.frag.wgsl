@@ -1,4 +1,12 @@
 // Simulation buffer
+struct Parameters {
+    n : f32,
+    l : f32,
+    m : f32,
+    opacityFactor : f32,
+    Z : f32
+}
+@group(0) @binding(0) var<uniform> parameters: Parameters;
 
 
 // System constants
@@ -183,11 +191,11 @@ fn atomPsi(pos : vec3<f32>, n : i32, l : i32, m : i32, Z : f32) -> f32 {
 
 fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
     // Constants
-    let n = 2;
-    let l = 1;
-    let m = 1;
-    let opacityFactor = 500.0;
-    let Z = 1.0;
+    let n = i32(parameters.n);
+    let l = i32(parameters.l);
+    let m = i32(parameters.m);
+    let opacityFactor = parameters.opacityFactor;
+    let Z = parameters.Z;
 
     // Screen viewing boundaries
     let xRange = vec2(-20.0, 20.0);

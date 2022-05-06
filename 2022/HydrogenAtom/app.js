@@ -1,3 +1,13 @@
+function getConfig() {
+    return [
+        parseInt(document.getElementById('param_n').value),
+        parseInt(document.getElementById('param_l').value),
+        parseInt(document.getElementById('param_m').value),
+        parseInt(document.getElementById('param_opacity').value),
+        parseInt(document.getElementById('param_z').value)
+    ];
+}
+
 async function startProgram() {
     // Add loading GPU module
     const otMeta = document.createElement('meta');
@@ -21,7 +31,7 @@ async function startProgram() {
     await simulator.initialize();
 
     // Start engine
-    simulator.run();
+    await simulator.run();
 }
 
 

@@ -42,7 +42,7 @@ class WebGPUSimulator {
 
 
 
-	run() {
+	async run() {
 		// == START ENGINE ==
 		if (this._debug)
 			console.log("\n\n\n== STARTING ENGINE ==");
@@ -53,7 +53,7 @@ class WebGPUSimulator {
 		let frameCount = 0;
 		let lastTime = Date.now();
 
-		this.loop = function () {
+		this.loop = async function () {
 			if (this._debug && frameCount % 100 == 0) {
 				let newTime = Date.now();
 				let deltaTime = newTime - lastTime;
@@ -63,7 +63,7 @@ class WebGPUSimulator {
 			}
 
 			// Render frame
-			this.draw();
+			await this.draw();
 			frameCount++;
 
 			// Request next frame
@@ -74,9 +74,12 @@ class WebGPUSimulator {
 		this.loop();
 	}
 
-	draw() {
+	async draw() {
 		// Update attachments
 		this.updateAttachments();
+
+		// Update buffer configuration data
+		await this.setBufferData(this.buffers.configuration, new Float32Array(getConfig()));
 
 		// Record and run commands
 		this.recordGPUCommands();
@@ -117,6 +120,7 @@ class WebGPUSimulator {
 		gpuRenderPassEncoder.setVertexBuffer(0, this.buffers.position);
 		gpuRenderPassEncoder.setVertexBuffer(1, this.buffers.color);
 		gpuRenderPassEncoder.setIndexBuffer(this.buffers.index, 'uint16');
+		gpuRenderPassEncoder.setBindGroup(0, this.bindGroups[0]);
 		gpuRenderPassEncoder.drawIndexed(6);
 		gpuRenderPassEncoder.end();
 
@@ -210,7 +214,9 @@ class WebGPUSimulator {
 
 	setupPipelineLayout() {
 		// Create pipeline layout
-		const pipelineLayoutDesc = { bindGroupLayouts: [] };
+		const pipelineLayoutDesc = {
+			bindGroupLayouts: this.bindGroupsLayouts
+		};
 		this.graphicsPipeline.layout = this.device.createPipelineLayout(pipelineLayoutDesc);
 
 		if (this._debug)
@@ -221,31 +227,35 @@ class WebGPUSimulator {
 
 
 	setupUBO() {
-		/*
-			const data = new Float32Array(...);
-			let uniformBuffer = createBuffer(data, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+		const data = new Float32Array(getConfig());
+		this.buffers.configuration = this.createBuffer(data, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
 
-			// Create the corresponding pipeline layout
-			let bindGroupLayout = this.device.createBindGroupLayout({
-				entries: [{
-					binding: 0,
-					visibility: GPUShaderStage.VERTEX
-				}]
-			});
-			
-			let uniformBindGroup = device.createBindGroup({
-				layout: uniformBindGroupLayout,
-				entries: [{
-					binding: 0,
-					resource: {
-						buffer: uniformBuffer
-					}
-				}]
-			});
+		// Create corresponding pipeline layout
+		let uniformBindGroupLayout = this.device.createBindGroupLayout({
+			entries: [{
+				binding: 0,
+				visibility: GPUShaderStage.FRAGMENT,
+				buffer: {}
+			}]
+		});
 
-			// Then to bind group :
-			passEncoder.setBindGroup(0, uniformBindGroup);
-		*/
+		let uniformBindGroup = this.device.createBindGroup({
+			layout: uniformBindGroupLayout,
+			entries: [{
+				binding: 0,
+				resource: { buffer: this.buffers.configuration }
+			}]
+		});
+
+		// Reference bind groups layouts
+		this.bindGroupsLayouts = [uniformBindGroupLayout];
+		this.bindGroups = [uniformBindGroup];
+
+		// Log
+		if (this._debug) {
+			console.log("Uniform bind groups : ", this.bindGroups);
+			console.log("Uniform bind groups layouts : ", this.bindGroupsLayouts);
+		}
 	}
 
 	async setupShaders() {
@@ -294,6 +304,10 @@ class WebGPUSimulator {
 
 		const indices = new Uint16Array([0, 1, 2, 2, 1, 3]);
 		this.buffers.index = this.createBuffer(indices, GPUBufferUsage.INDEX);
+
+		
+		// Configuration
+		// Done in create ubo
 
 
 		// Log buffers
@@ -397,11 +411,19 @@ class WebGPUSimulator {
 		// Align to 4 bytes
 		let desc = { size: ((arr.byteLength + 3) & ~3), usage, mappedAtCreation: true };
 		let buffer = this.device.createBuffer(desc);
-
 		const writeArray = arr instanceof Uint16Array ? new Uint16Array(buffer.getMappedRange()) : new Float32Array(buffer.getMappedRange());
 		writeArray.set(arr);
 		buffer.unmap();
 
 		return buffer;
 	};
+
+	/**
+	 * Change the buffer data (assuming same size)
+	 * @param buffer The corresponding buffer
+	 * @param arr Array of data in the buffer
+	 */
+	async setBufferData(buffer, arr) {
+		this.queue.writeBuffer(buffer, 0, arr);
+	}
 }
