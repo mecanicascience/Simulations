@@ -6,10 +6,12 @@ async function startProgram() {
     document.head.append(otMeta);
 
     // Check WebGPU compatibility
-    if (navigator.gpu == undefined)
-        console.log("wsh");
-    if (navigator.gpu == undefined)
+    if (navigator.gpu == undefined) {
+        const errorDom = document.createElement('p');
+        errorDom.innerHTML = "Your browser doesn't support WebGPU.\nPlease use one of the last Google Chrome version.";
+        document.getElementById('error_div').append(errorDom);
         throw new Error('WebGPU is not supported on this browser.');
+    }
 
     // Start WebGPU Simulator
     let canvas = document.getElementById('drawing-canvas');
