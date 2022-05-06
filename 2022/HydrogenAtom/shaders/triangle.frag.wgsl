@@ -1,10 +1,10 @@
 // Simulation buffer
 struct Parameters {
-    n : f32,
-    l : f32,
-    m : f32,
-    opacityFactor : f32,
-    Z : f32
+    n : f32;
+    l : f32;
+    m : f32;
+    opacityFactor : f32;
+    Z : f32;
 }
 @group(0) @binding(0) var<uniform> parameters: Parameters;
 
@@ -230,8 +230,8 @@ fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
         if (psi < 0.0) {
             colorLoc = vec3<f32>(105.0, 189.0, 218.0) / 255.0;
         }
-        color += colorLoc;
-        proba += psi * psi;
+        color = color + colorLoc;
+        proba = proba + psi * psi;
     }
     
     let opacity = min(1.0, max(0.0, proba / f32(RES_PLANE_COUNTS)));
