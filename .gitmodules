@@ -1,8 +1,8 @@
 [submodule "2020/Article_La_3D_par_la_perspective"]
 	path = 2020/Article_La_3D_par_la_perspective
 	url = https://github.com/Epsylene/Fake_3D
-[submodule "2020/ElectrostaticFields"]
-	path = 2020/ElectrostaticFields
+[submodule "2020/ElectrostaticField"]
+	path = 2020/ElectrostaticField
 	url = https://github.com/xam4lor/ElectromagnetismFields
 [submodule "2021/LanderSimulation"]
 	path = 2021/LanderSimulation
