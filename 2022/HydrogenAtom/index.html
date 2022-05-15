@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
         <title>Hydrogen Atom</title>
+        <style>
+            body {
+                margin: 0;
+                background-color: black;
+                color: white;
+                font-family: "Segoe UI", Arial, sans-serif !important;
+            }
+        
+            #simulationContent {
+                text-align: center;
+            }
+        </style>
 
+        <!-- Program libs -->
         <script src="app.js"></script>
         <script src="src/WebGPUSimulator.js"></script>
+        <script src="src/OptionsGUI.js"></script>
+
+        <!-- External libs -->
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/tweakpane@1.5.5/dist/tweakpane.min.js"></script>
     </head>
 
     <body>
-        <div id="error_div"></div>
-        <canvas id="drawing-canvas" width="800" height="800"></canvas>
-
-        <div class="configuration">
-            <label>n <input type="text" id="param_n" value="2" /></label><br />
-            <label>l <input type="text" id="param_l" value="1" /></label><br />
-            <label>m <input type="text" id="param_m" value="1" /></label><br />
-            <label>Opacity <input type="text" id="param_opacity" value="5000" /></label><br />
-            <label>Z <input type="text" id="param_z" value="1" /></label>
+        <div id="simulationContent">
+            <div id="error_div"></div>
+            <canvas id="drawing-canvas" width="800" height="800"></canvas>
         </div>
     </body>
 </html>

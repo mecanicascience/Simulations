@@ -1,14 +1,22 @@
 function getConfig() {
     return [
-        parseInt(document.getElementById('param_n').value),
-        parseInt(document.getElementById('param_l').value),
-        parseInt(document.getElementById('param_m').value),
-        parseInt(document.getElementById('param_opacity').value),
-        parseInt(document.getElementById('param_z').value)
+        parseInt(this.params.n()),
+        parseInt(this.params.l()),
+        parseInt(this.params.m()),
+        parseInt(this.params.opacity()),
+        parseInt(this.params.Z())
     ];
 }
 
 async function startProgram() {
+    // Set canvas size
+    let can = document.getElementById('drawing-canvas');
+    can.width = window.innerWidth;
+    can.height = window.innerHeight;
+
+    // Load GUI
+    loadGUI();
+
     // Add loading GPU module
     const otMeta = document.createElement('meta');
     otMeta.httpEquiv = 'origin-trial';
@@ -32,6 +40,21 @@ async function startProgram() {
 
     // Start engine
     await simulator.run();
+}
+
+async function loadGUI() {
+    this.params = {};
+    this.optionsGUI = new OptionsGUI();
+    this.optionsGUI.addFolder('\\text{Paramètres}', 'root', 'parameters');
+    
+    this.optionsGUI.addFolder('\\text{Configuration}', this.optionsGUI.datas.parameters, 'config');
+    this.params.opacity = this.optionsGUI.addInput("\\text{Opacité}", 5000, 1000, 100000, this.optionsGUI.datas.parameters.config);
+    this.params.Z = this.optionsGUI.addInput("\\text{Numéro atomique} Z", 1, 1, 10, this.optionsGUI.datas.parameters.config);
+
+    this.optionsGUI.addFolder('\\text{Nombre quantiques}', this.optionsGUI.datas.parameters, 'quantum_numbers');
+    this.params.n = this.optionsGUI.addInput("n", 2, 0, 10, this.optionsGUI.datas.parameters.quantum_numbers);
+    this.params.l = this.optionsGUI.addInput("l", 1, 1, 10, this.optionsGUI.datas.parameters.quantum_numbers);
+    this.params.m = this.optionsGUI.addInput("m", 0, -10, 10, this.optionsGUI.datas.parameters.quantum_numbers);
 }
 
 
