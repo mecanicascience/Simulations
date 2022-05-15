@@ -11,8 +11,8 @@ function getConfig() {
 async function startProgram() {
     // Set canvas size
     let can = document.getElementById('drawing-canvas');
-    can.width = window.innerWidth;
-    can.height = window.innerHeight;
+    can.width = window.innerWidth * 0.95;
+    can.height = window.innerHeight * 0.95;
 
     // Load GUI
     loadGUI();
