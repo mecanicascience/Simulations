@@ -26,7 +26,7 @@ async function startProgram() {
     // Check WebGPU compatibility
     if (navigator.gpu == undefined) {
         const errorDom = document.createElement('p');
-        errorDom.innerHTML = "Your browser doesn't support WebGPU.\nPlease use one of the last Google Chrome version.";
+        errorDom.innerHTML = "Your browser doesn't support WebGPU.\nPlease use one of the latests Google Chrome versions.";
         document.getElementById('error_div').append(errorDom);
         throw new Error('WebGPU is not supported on this browser.');
     }
