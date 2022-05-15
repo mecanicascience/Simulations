@@ -49,13 +49,14 @@ class OptionsGUI {
     * @param minValue     Minimum value of the input (default 0)
     * @param maxValue     Maximum value of the input (default 10)
     * @param folder       Reference of the folder (default this.datas.configuration)
+    * @param step         Size of a step for the input
     * @return A function that returns the current value of the input
     */
-    addInput(name, defaultValue = 0, minValue = 0, maxValue = 10, folder = this.datas.configuration) {
+    addInput(name, defaultValue = 0, minValue = 0, maxValue = 10, folder = this.datas.configuration, step = undefined) {
         folder._params[name] = defaultValue;
         folder._values[name] = defaultValue;
         let newInput = folder._folder
-            .addInput(folder._params, name, { min: minValue, max: maxValue })
+            .addInput(folder._params, name, { min: minValue, max: maxValue, step: step })
             .on('change', (value) => folder._values[name] = value);
 
         if (this.usesMathJax)
