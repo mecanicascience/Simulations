@@ -165,12 +165,12 @@ fn R(r : f32, n : i32, l : i32, Z : f32) -> f32 {
     let normalizationFac = sqrt(
           pow(2.0 * Z / f32(n), 3.0)
         * f32(factorial(n - l - 1))
-        / (2.0 * f32(n) * pow(f32(factorial(n + l)), 3.0))
+        / (2.0 * f32(n) * f32(factorial(n + l)))
     );
 
     return normalizationFac
             * exp(-Z/f32(n) * r)
-            * laguerreGeneralises(Z/f32(n) * r, n, l)
+            * laguerreGeneralises(2.0 * Z/f32(n) * r, n, l)
             * pow(2.0 * Z/f32(n) * r, f32(l));
 }
 
@@ -214,7 +214,7 @@ fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
     // Number of planes to compute the wavefunction sum
     let RES_PLANE_COUNTS = 100;
     // Area to sum over each wavefunction
-    let RES_PLANE_AREA = 10;
+    let RES_PLANE_AREA = 5;
 
     // Sum over each planes
     var proba = 0.0;
@@ -235,7 +235,8 @@ fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
     }
     
     let opacity = min(1.0, max(0.0, proba / f32(RES_PLANE_COUNTS)));
-    return color / f32(RES_PLANE_COUNTS) * opacity * opacityFactor;
+    let computedColor = color / f32(RES_PLANE_COUNTS) * opacity * opacityFactor;
+    return vec3(min(computedColor.r, 1.0), min(computedColor.g, 1.0), min(computedColor.b, 1.0));
 }
 
 

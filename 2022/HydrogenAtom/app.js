@@ -3,7 +3,7 @@ function getConfig() {
         parseInt(this.params.n()),
         parseInt(this.params.l()),
         parseInt(this.params.m()),
-        parseInt(this.params.opacity()),
+        parseFloat(this.params.opacity()),
         parseInt(this.params.Z())
     ];
 }
@@ -48,13 +48,13 @@ async function loadGUI() {
     this.optionsGUI.addFolder('\\text{Paramètres}', 'root', 'parameters');
     
     this.optionsGUI.addFolder('\\text{Configuration}', this.optionsGUI.datas.parameters, 'config');
-    this.params.opacity = this.optionsGUI.addInput("\\text{Opacité}", 5000, 1000, 100000, this.optionsGUI.datas.parameters.config, 100);
+    this.params.opacity = this.optionsGUI.addInput("\\text{Opacité}", 12.0, 0.1, 500, this.optionsGUI.datas.parameters.config, 0.1);
     this.params.Z = this.optionsGUI.addInput("\\text{Numéro atomique} Z", 1, 1, 10, this.optionsGUI.datas.parameters.config, 1);
 
     this.optionsGUI.addFolder('\\text{Nombre quantiques}', this.optionsGUI.datas.parameters, 'quantum_numbers');
-    this.params.n = this.optionsGUI.addInput("n", 2, 0, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
-    this.params.l = this.optionsGUI.addInput("l", 1, 1, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
-    this.params.m = this.optionsGUI.addInput("m", 0, -10, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
+    this.params.n = this.optionsGUI.addInput("n", 4, 0, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
+    this.params.l = this.optionsGUI.addInput("l", 1, 0, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
+    this.params.m = this.optionsGUI.addInput("m", -1, -10, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
 }
 
 
