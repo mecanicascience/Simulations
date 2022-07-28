@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Hydrogen Atom</title>
+        <style>
+            body {
+                margin: 0;
+                /* background-color: black; */
+                color: white;
+                font-family: "Segoe UI", Arial, sans-serif !important;
+            }
+        
+            #simulationContent {
+                text-align: center;
+            }
+        </style>
+
+        <!-- Program libs -->
+        <script src="app.js"></script>
+        <script src="src/WebGPUAPI.js"></script>
+        <script src="src/OptionsGUI.js"></script>
+        <script src="src/Simulator.js"></script>
+
+        <!-- External libs -->
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/tweakpane@1.5.5/dist/tweakpane.min.js"></script>
+    </head>
+
+    <body>
+        <canvas id="drawing-canvas" width="800" height="800"></canvas>
+    </body>
+</html>
