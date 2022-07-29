@@ -42,13 +42,18 @@ class WebGPUAPI {
 		this.canvas = { html: canvas };
 	}
 
-	/** Initialize WebGPU */
+	/**
+	 * Initialize WebGPU
+	 * @return true if the browser supports WebGPU and false if it doesn't
+	 */
 	async initialize() {
 		// ==== INITIALIZE ENGINE ====
 		// Get WebGPU
 		this.gpu = navigator.gpu;
-		if (this.gpu == undefined || this.gpu == {} || !'gpu' in navigator)
+		if (this.gpu == undefined || this.gpu == {} || !'gpu' in navigator) {
 			console.error("Your browser doesn't support WebGPU.");
+			return false;
+		}
 
 		// Get rendering devices
 		this.physicalDevice = await this.gpu.requestAdapter(); // Physical device
@@ -62,6 +67,7 @@ class WebGPUAPI {
 			format: 'bgra8unorm',
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		});
+		return true;
 	}
 
 	/** Update WebGPU data */

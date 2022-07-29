@@ -10,7 +10,8 @@ class Simulator {
     async initialize() {
         // Initialize
         this.api = new WebGPUAPI(document.getElementById('drawing-canvas'));
-        await this.api.initialize();
+        if (!await this.api.initialize())
+            document.getElementById('error-p').innerHTML = "Your browser doesn't support WebGPU yet. Try using the latest Google Chrome version.";
 
 
         // ===== CONFIG =====
