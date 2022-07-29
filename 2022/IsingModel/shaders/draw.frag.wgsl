@@ -10,13 +10,6 @@ struct GridData {
 @group(0) @binding(1) var<uniform> inGridData : GridData;
 
 
-// ==== Simulation ====
-struct SelectedSpinData {
-    pos : vec2<f32>
-};
-@group(1) @binding(2) var<uniform> inSelectedSpinData : SelectedSpinData;
-
-
 @fragment
 fn main(@location(0) inUv : vec2<f32>) -> @location(0) vec4<f32> {
     let coords = vec2<f32>(floor(inUv.x * inGridData.size.x), floor(inUv.y * inGridData.size.y));

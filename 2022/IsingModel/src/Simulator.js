@@ -1,6 +1,10 @@
 class Simulator {
     constructor(canvas) {
         this.canvas = canvas;
+
+        // Resize canvas to window size
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight * 0.999;
     }
 
     async initialize() {
@@ -11,26 +15,30 @@ class Simulator {
 
         // ===== CONFIG =====
         // General config
-        this.spinsCountW = 200; // Grid side size
-        this.runCountByTick = 200; // Numbers of spins flipped each tick
-        this.spinsCount = this.spinsCountW * this.spinsCountW;
-
-        // Physics data
-        let temperature = 3;
+        let size = 4000; // Number of spins on a side
+        let temperature = 2;
         let spin = 1;
         let couplingConst = 1;
+        this.runCountByTick = 1; // Numbers of spins flipped each tick
 
+        // Set config values
+        this.gridSize = [size, parseInt(size * this.canvas.height / this.canvas.width)]; // Grid side size
+        this.spinsCount = this.gridSize[0] * this.gridSize[1];
+
+        // Counting values
+        this.stepsCount = -1;
+        this.stepDisplayed = -100;
+        this.frameID = 0;
 
         // ===== DATA STORAGE =====
         // Create data containers
         this.spinsData = {
             spinsBuffer: this.api.createBuffer(new Uint32Array(this.spinsCount), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST),
-            spinsData: this.api.createBuffer(new Float32Array([this.spinsCountW, this.spinsCountW]), GPUBufferUsage.UNIFORM)
+            spinsData: this.api.createBuffer(new Float32Array([this.gridSize[0], this.gridSize[1]]), GPUBufferUsage.UNIFORM)
         };
         this.physicsData = {
-            randomValues: this.api.createBuffer(new Float32Array([0, 0, 1, 1]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
-            physData: this.api.createBuffer(new Float32Array([temperature, spin, couplingConst]), GPUBufferUsage.UNIFORM),
-            selectedSpin: this.api.createBuffer(new Float32Array([-1, -1]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST)
+            simValues: this.api.createBuffer(new Float32Array([0, 0, 1, 1, 0]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
+            physData: this.api.createBuffer(new Float32Array([temperature, spin, couplingConst]), GPUBufferUsage.UNIFORM)
         };
 
         // Create graphics pipeline
@@ -52,26 +60,6 @@ class Simulator {
                         visibility: GPUShaderStage.FRAGMENT,
                         bufferAccess: "uniform",
                         buffer: this.spinsData.spinsData
-                    }
-                ],
-                [
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.FRAGMENT,
-                        bufferAccess: "uniform",
-                        buffer: this.physicsData.randomValues
-                    },
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.FRAGMENT,
-                        bufferAccess: "uniform",
-                        buffer: this.physicsData.physData
-                    },
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.FRAGMENT,
-                        bufferAccess: "uniform",
-                        buffer: this.physicsData.selectedSpin
                     }
                 ]
             ]
@@ -100,19 +88,13 @@ class Simulator {
                         type: "buffer",
                         visibility: GPUShaderStage.COMPUTE,
                         bufferAccess: "uniform",
-                        buffer: this.physicsData.randomValues
+                        buffer: this.physicsData.simValues
                     },
                     {
                         type: "buffer",
                         visibility: GPUShaderStage.COMPUTE,
                         bufferAccess: "uniform",
                         buffer: this.physicsData.physData
-                    },
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.COMPUTE,
-                        bufferAccess: "uniform",
-                        buffer: this.physicsData.selectedSpin
                     }
                 ]
             ]
@@ -129,10 +111,6 @@ class Simulator {
 
         // Update spins
         this.api.updateBuffer(this.spinsData.spinsBuffer, randomSpins);
-
-        // Counting values
-        this.stepsCount = -1;
-        this.stepDisplayed = -100;
     }
 
     async tick(dt) {
@@ -150,17 +128,17 @@ class Simulator {
         // Run compute shader
         for (let i = 0; i < this.runCountByTick; i++) {
             // Update random values
-            let translVector = [Math.round(Math.random() * 1000000) / 1000, Math.round(Math.random() * 1000000) / 1000];
-            let scaleVector = [Math.round(Math.random() * 1000000) / 10000 + 1, Math.round(Math.random() * 100000) / 10000 + 1];
-            this.api.updateBuffer(this.physicsData.randomValues, new Float32Array([translVector[0], translVector[1], scaleVector[0], scaleVector[1]]));
-
-            // Update selected spin
-            let selectedSpin = [Math.floor(Math.random() * this.spinsCountW), Math.floor(Math.random() * this.spinsCountW)];
-            this.api.updateBuffer(this.physicsData.selectedSpin, new Float32Array([selectedSpin[0], selectedSpin[1]]));
+            let translVectorRand = [Math.round(Math.random() * 1000000) / 10000, Math.round(Math.random() * 1000000) / 10000];
+            let scaleVectorRand = [Math.round(Math.random() * 1000000) / 300000 + 1, Math.round(Math.random() * 100000) / 300000 + 1];
+            this.frameID = (this.frameID + 1) % 2;
+            this.api.updateBuffer(this.physicsData.simValues, new Float32Array([
+                translVectorRand[0], translVectorRand[1],
+                scaleVectorRand[0], scaleVectorRand[1],
+                this.frameID
+            ]));
 
             // Run compute pipeline
-            let worksGCount = Math.ceil(this.spinsCountW / 16.0);
-            this.computePipeline.run(worksGCount, worksGCount);
+            this.computePipeline.run(Math.ceil(this.gridSize[0] / 16.0), Math.ceil(this.gridSize[1] / 16.0));
         }
 
         // Debug values

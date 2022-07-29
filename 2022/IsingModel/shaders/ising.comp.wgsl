@@ -11,11 +11,12 @@ struct GridData {
 
 
 // ==== Simulation ====
-struct RandomValues {
-    translationValues : vec2<f32>,
-    scaleValues : vec2<f32>
+struct SimulationValues {
+    translationRandValues : vec2<f32>,
+    scaleRandValues : vec2<f32>,
+    frameID : f32
 };
-@group(1) @binding(0) var<uniform> inRandomValues : RandomValues;
+@group(1) @binding(0) var<uniform> inSimValues : SimulationValues;
 
 struct PhysData {
     temperature : f32,
@@ -23,11 +24,6 @@ struct PhysData {
     couplingConst : f32
 };
 @group(1) @binding(1) var<uniform> inPhysicsData : PhysData;
-
-struct SelectedSpinData {
-    pos : vec2<f32>
-};
-@group(1) @binding(2) var<uniform> inSelectedSpinData : SelectedSpinData;
 
 
 
@@ -38,10 +34,15 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         return;
     }
 
-    // Check if this spin was selected
-    if (inSelectedSpinData.pos.x != coords.x || inSelectedSpinData.pos.y != coords.y) {
-        return;
-    }
+    // Check if this spin can be selected during this frame
+    if (inSimValues.frameID == 0 && (
+           (coords.y % 2 == 0 && coords.x % 2 == 0)
+        || (coords.y % 2 == 1 && coords.x % 2 == 1)
+    )) { return; }
+    if (inSimValues.frameID == 1 && (
+           (coords.y % 2 == 0 && coords.x % 2 == 1)
+        || (coords.y % 2 == 1 && coords.x % 2 == 0)
+    )) { return; }
 
     // Set spin by running the algorithm
     inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)] = metropolis(coords);
@@ -83,7 +84,6 @@ fn computeEnergy(sp : u32, coords : vec2<f32>) -> f32 {
     let j = inPhysicsData.couplingConst;
 
     // Sum over 4 neighbor (periodic conditions)
-    // Using +- inGridData.size before modulos because -1 % 5 == -1 in WGSL
     return -j * s * atomS * (f32(spinAt(coords.x, coords.y + 1)) * 2.0 - 1.0)
            -j * s * atomS * (f32(spinAt(coords.x, coords.y - 1)) * 2.0 - 1.0)
            -j * s * atomS * (f32(spinAt(coords.x + 1, coords.y)) * 2.0 - 1.0)
@@ -110,7 +110,7 @@ fn spinAt(x : f32, y : f32) -> u32 {
 // Gives a random number between 0 and 1
 // Using UE4 RandFast : https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Shaders/Private/Random.ush
 fn randFast(v : vec2<f32>) -> f32 {
-    let v2 = (v + inRandomValues.translationValues) * inRandomValues.scaleValues;
+    let v2 = (v + inSimValues.translationRandValues) * inSimValues.scaleRandValues;
     let magic = 3571.0;
     let random2 = (1.0 / 4320.0) * v2 + vec2<f32>(0.25, 0.0);
     let random = fract(dot(random2 * random2, vec2<f32>(magic)));
