@@ -35,13 +35,13 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     }
 
     // Check if this spin can be selected during this frame
-    if (inSimValues.frameID == 0 && (
-           (coords.y % 2 == 0 && coords.x % 2 == 0)
-        || (coords.y % 2 == 1 && coords.x % 2 == 1)
+    if (inSimValues.frameID == 0.0 && (
+           (coords.y % 2.0 == 0.0 && coords.x % 2 == 0.0)
+        || (coords.y % 2.0 == 1.0 && coords.x % 2 == 1.0)
     )) { return; }
-    if (inSimValues.frameID == 1 && (
-           (coords.y % 2 == 0 && coords.x % 2 == 1)
-        || (coords.y % 2 == 1 && coords.x % 2 == 0)
+    if (inSimValues.frameID == 1.0 && (
+           (coords.y % 2.0 == 0.0 && coords.x % 2.0 == 1.0)
+        || (coords.y % 2.0 == 1.0 && coords.x % 2.0 == 0.0)
     )) { return; }
 
     // Set spin by running the algorithm
@@ -57,12 +57,12 @@ fn metropolis(coords : vec2<f32>) -> u32 {
 
     // Compute old and new energies
 	let oldE = 2.0 * computeEnergy(sp, coords);
-    if (sp == 0) { sp = 1; } else { sp = 0; } // Invert spin
+    if (sp == 0u) { sp = 1u; } else { sp = 0u; } // Invert spin
 	let newE = 2.0 * computeEnergy(sp, coords);
 
     // Run Metropolis algorithm
 	let deltaE = newE - oldE;
-    if (deltaE < 0) { // DeltaE < 0 : Change accepted
+    if (deltaE < 0.0) { // DeltaE < 0 : Change accepted
         return sp;
     }
 
@@ -72,7 +72,7 @@ fn metropolis(coords : vec2<f32>) -> u32 {
     if (invertProba <= exp(-beta * deltaE)) {
         return sp; // Change accepted
     }
-    if (sp == 0) { sp = 1; } else { sp = 0; } // Change refused
+    if (sp == 0u) { sp = 1u; } else { sp = 0u; } // Change refused
     return sp;
 }
 
