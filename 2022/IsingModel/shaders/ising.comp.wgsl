@@ -11,6 +11,23 @@ struct GridData {
 
 
 // ==== Simulation ====
+struct RandomValues {
+    translationValues : vec2<f32>,
+    scaleValues : vec2<f32>
+};
+@group(1) @binding(0) var<uniform> inRandomValues : RandomValues;
+
+struct PhysData {
+    temperature : f32,
+    spin : f32,
+    couplingConst : f32
+};
+@group(1) @binding(1) var<uniform> inPhysicsData : PhysData;
+
+struct SelectedSpinData {
+    pos : vec2<f32>
+};
+@group(1) @binding(2) var<uniform> inSelectedSpinData : SelectedSpinData;
 
 
 
@@ -21,14 +38,81 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         return;
     }
 
-    // Get spin
-    let sp = inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)];
+    // Check if this spin was selected
+    if (inSelectedSpinData.pos.x != coords.x || inSelectedSpinData.pos.y != coords.y) {
+        return;
+    }
 
-    // Set spin
-    if (sp == 0) {
-        inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)] = 0;
+    // Set spin by running the algorithm
+    inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)] = metropolis(coords);
+}
+
+
+
+// ======== PHYSICS ========
+// Check if the spin should be inverted using the Metropolis algorithm
+fn metropolis(coords : vec2<f32>) -> u32 {
+    var sp = spinAt(coords.x, coords.y);
+
+    // Compute old and new energies
+	let oldE = 2.0 * computeEnergy(sp, coords);
+    if (sp == 0) { sp = 1; } else { sp = 0; } // Invert spin
+	let newE = 2.0 * computeEnergy(sp, coords);
+
+    // Run Metropolis algorithm
+	let deltaE = newE - oldE;
+    if (deltaE < 0) { // DeltaE < 0 : Change accepted
+        return sp;
     }
-    else {
-        inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)] = 1;
+
+    // DeltaE >= 0
+    let invertProba = randFast(coords);
+    let beta = 1.0 / inPhysicsData.temperature;
+    if (invertProba <= exp(-beta * deltaE)) {
+        return sp; // Change accepted
     }
+    if (sp == 0) { sp = 1; } else { sp = 0; } // Change refused
+    return sp;
+}
+
+// Compute the energy given by the atom and given it's spin sp
+fn computeEnergy(sp : u32, coords : vec2<f32>) -> f32 {
+    // Grid and atom values
+    let atomS = f32(sp) * 2.0 - 1.0;
+    let s = inPhysicsData.spin;
+    let j = inPhysicsData.couplingConst;
+
+    // Sum over 4 neighbor (periodic conditions)
+    // Using +- inGridData.size before modulos because -1 % 5 == -1 in WGSL
+    return -j * s * atomS * (f32(spinAt(coords.x, coords.y + 1)) * 2.0 - 1.0)
+           -j * s * atomS * (f32(spinAt(coords.x, coords.y - 1)) * 2.0 - 1.0)
+           -j * s * atomS * (f32(spinAt(coords.x + 1, coords.y)) * 2.0 - 1.0)
+           -j * s * atomS * (f32(spinAt(coords.x - 1, coords.y)) * 2.0 - 1.0);
+}
+
+
+
+// ======= UTILS ========
+// Return the spin of the element at given coordinates, handle edges
+fn spinAt(x : f32, y : f32) -> u32 {
+    var coordsAbs = vec2<f32>(x, y);
+    // Check if x in range
+    if (coordsAbs.x >= inGridData.size.x) { coordsAbs.x -= inGridData.size.x; }
+    else if (coordsAbs.x < 0) { coordsAbs.x += inGridData.size.x; }
+
+    // Check if y in range
+    if (coordsAbs.y >= inGridData.size.y) { coordsAbs.y -= inGridData.size.y; }
+    else if (coordsAbs.y < 0) { coordsAbs.y += inGridData.size.y; }
+
+    return inGridSpins.points[i32(round(coordsAbs.x) + round(coordsAbs.y) * inGridData.size.x)];
+}
+
+// Gives a random number between 0 and 1
+// Using UE4 RandFast : https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Shaders/Private/Random.ush
+fn randFast(v : vec2<f32>) -> f32 {
+    let v2 = (v + inRandomValues.translationValues) * inRandomValues.scaleValues;
+    let magic = 3571.0;
+    let random2 = (1.0 / 4320.0) * v2 + vec2<f32>(0.25, 0.0);
+    let random = fract(dot(random2 * random2, vec2<f32>(magic)));
+    return fract(random * random * (magic * 2.0));
 }

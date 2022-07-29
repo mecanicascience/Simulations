@@ -514,7 +514,8 @@ class WebGPUAPI {
 		return {
 			buffer: buffer,
 			size: size,
-			offset: 0
+			offset: 0,
+			type: type
 		};
 	}
 
