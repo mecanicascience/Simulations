@@ -98,11 +98,11 @@ fn spinAt(x : f32, y : f32) -> u32 {
     var coordsAbs = vec2<f32>(x, y);
     // Check if x in range
     if (coordsAbs.x >= inGridData.size.x) { coordsAbs.x -= inGridData.size.x; }
-    else if (coordsAbs.x < 0) { coordsAbs.x += inGridData.size.x; }
+    else if (coordsAbs.x < 0.0) { coordsAbs.x += inGridData.size.x; }
 
     // Check if y in range
     if (coordsAbs.y >= inGridData.size.y) { coordsAbs.y -= inGridData.size.y; }
-    else if (coordsAbs.y < 0) { coordsAbs.y += inGridData.size.y; }
+    else if (coordsAbs.y < 0.0) { coordsAbs.y += inGridData.size.y; }
 
     return inGridSpins.points[i32(round(coordsAbs.x) + round(coordsAbs.y) * inGridData.size.x)];
 }
