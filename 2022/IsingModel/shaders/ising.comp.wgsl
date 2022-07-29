@@ -36,8 +36,8 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 
     // Check if this spin can be selected during this frame
     if (inSimValues.frameID == 0.0 && (
-           (coords.y % 2.0 == 0.0 && coords.x % 2 == 0.0)
-        || (coords.y % 2.0 == 1.0 && coords.x % 2 == 1.0)
+           (coords.y % 2.0 == 0.0 && coords.x % 2.0 == 0.0)
+        || (coords.y % 2.0 == 1.0 && coords.x % 2.0 == 1.0)
     )) { return; }
     if (inSimValues.frameID == 1.0 && (
            (coords.y % 2.0 == 0.0 && coords.x % 2.0 == 1.0)
