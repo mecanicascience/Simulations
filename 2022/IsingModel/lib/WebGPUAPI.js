@@ -57,6 +57,10 @@ class WebGPUAPI {
 
 		// Get rendering devices
 		this.physicalDevice = await this.gpu.requestAdapter(); // Physical device
+		if (this.physicalDevice == undefined || this.physicalDevice == null) {
+			console.error("Your browser doesn't support WebGPU. No physical device found.");
+			return false;
+		}
 		this.device = await this.physicalDevice.requestDevice(); // Logical device
 		this.queue = this.device.queue;
 
