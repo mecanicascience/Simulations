@@ -3,31 +3,33 @@
  * Copyright @MecanicaScience https://mecanicascience.fr.
  * Basic source code example :
  * ```
- *  // Initialize
- *  let sim = new WebGPUAPI(document.getElementById('drawing-canvas'));
- *  await sim.initialize();
+ *  // Initialize API
+ *  let simulator = new WebGPUAPI(document.getElementById('drawing-canvas'));
+ *  await simulator.initialize();
  * 
- *  // Update simulator
- *  sim.tick();
+ *  // Update WebGPU graphics components
+ *  simulator.tick();
  * 
- *  // Create graphics pipeline and runs it
- *  let graphicsBuffer = sim.createBuffer(new Uint32Array([0, 0]), GPUBufferUsage.UNIFORM);
- *  let graphicsPip = await sim.createGraphicsPipeline({
+ *  // Create graphics pipeline
+ *  let graphicsBuffer = simulator.createBuffer(new Uint32Array([0, 0]), GPUBufferUsage.UNIFORM); // Random data buffer
+ *  let graphicsPip = await simulator.createGraphicsPipeline({
  *      shaders: [
  *          { type: "vert", src: "shaders/draw.vert.wgsl" },
  *          { type: "frag", src: "shaders/draw.frag.wgsl" }
  *      ],
- *      layouts: [[{
+ *      layouts: [[{ // Pass buffer as input (0, 0) in shader
  *          type: "buffer",
  *          visibility: GPUShaderStage.FRAGMENT,
  *          bufferAccess: "read-only-storage",
  *          buffer: graphicsBuffer
  *      }]]
  *  });
+ * 
+ *  // Draw
  *  graphicsPip.run();
  * 
  *  // Read buffer data
- *  console.log(sim.readBuffer(graphicsBuffer));
+ *  console.log(await simulator.readBuffer(graphicsBuffer));
  * ```
  */
 class WebGPUAPI {

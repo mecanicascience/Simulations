@@ -1,4 +1,9 @@
-class OptionsGUI {
+/**
+ * This API can create simple menu options and items.
+ * Copyright @MecanicaScience https://mecanicascience.fr.
+ * Using tweakpane v1.5 API https://cdn.jsdelivr.net/npm/tweakpane@1.5/dist/tweakpane.min.js
+ */
+class OptionsGuiAPI {
     constructor() {
         window._optionsGUIInstance = this;
         this.usesMathJax = MathJax != undefined;
@@ -15,22 +20,18 @@ class OptionsGUI {
     newPane() {
         this.pane = new Tweakpane();
         this.datas = {};
-        //this.addFolder('\\text{Configuration}', 'root', 'configuration');
     }
 
     /**
     * Adds a folder
-    * @param title Title of the folder (stored as title.toLowerCase() in object if storedName undefined)
+    * @param title Title of the folder
     * @param parent Parent of the folder (default 'root')
-    * @param storedName Stored name of the folder in this.datas
     * @param hidden Is folder hidden (default false)
     */
-    addFolder(title, parent = 'root', storedName, hidden = false) {
-        if (parent == 'root')
+    addFolder(title, parent = 'root', hidden = false) {
+        if (parent == 'root' || parent == undefined)
             parent = this.datas;
-        if (storedName == undefined)
-            storedName = title.toLowerCase();
-
+        let storedName = title.toLowerCase();
         let folder = (parent == this.datas ? this.pane : parent._folder).addFolder({ title, hidden });
         parent[storedName] = {
             _params: {},
@@ -39,20 +40,21 @@ class OptionsGUI {
         };
 
         this.processHTMLLaTeX(folder.controller.view.elem_.children[0], 'folder');
+        return parent[storedName];
     }
 
 
     /**
     * Add an integer configuration input to the screen (if you imported MathJax, uses LaTeX to display)
     * @param name         Name of the input
+    * @param folder       GUI parent folder of the input
     * @param defaultValue Default value of the input (default 0)
     * @param minValue     Minimum value of the input (default 0)
     * @param maxValue     Maximum value of the input (default 10)
-    * @param folder       Reference of the folder (default this.datas.configuration)
-    * @param step         Size of a step for the input
+    * @param step         Step size
     * @return A function that returns the current value of the input
     */
-    addInput(name, defaultValue = 0, minValue = 0, maxValue = 10, folder = this.datas.configuration, step = undefined) {
+    addInput(name, folder, defaultValue = 0, minValue = 0, maxValue = 10, step = undefined) {
         folder._params[name] = defaultValue;
         folder._values[name] = defaultValue;
         let newInput = folder._folder
@@ -69,10 +71,10 @@ class OptionsGUI {
     /**
     * Add a button to the screen (if you imported MathJax, uses LaTeX to display)
     * @param name     Name of the button
-    * @param callback OnClick callback
-    * @param folder   Reference of the folder (default this.datas.configuration)
+    * @param folder   GUI parent folder of the button
+    * @param callback Onclick callback
     */
-    addButton(name, callback, folder = this.datas.configuration) {
+    addButton(name, folder, callback) {
         let newInput = folder._folder
             .addButton({ title: name })
             .on('click', () => callback());
@@ -85,12 +87,15 @@ class OptionsGUI {
     /**
     * Add a list to the screen (if you imported MathJax, uses LaTeX to display)
     * @param name         Name of the list
-    * @param values       Values taken by the input
-    * @param defaultValue Integer value of the list
-    * @param folder       Reference of the folder (default this.datas.configuration)
+    * @param folder       GUI parent folder of the list
+    * @param values       Values of the list of format [{ text : "name1", value : "value1" }, ... ]
+    * @param defaultValue Default selected value of the list (default first value)
     * @return A function that returns the current value of the input
     */
-    addList(name, values, defaultValue, folder = this.datas.configuration) {
+    addList(name, folder, values, defaultValue = 0) {
+        if (defaultValue == 0)
+            defaultValue = values[0].value;
+
         folder._params[name] = defaultValue;
         folder._values[name] = defaultValue;
         let newInput = folder._folder
@@ -107,20 +112,17 @@ class OptionsGUI {
     /**
     * Add a Vector configuration input to the screen (if you imported MathJax, uses LaTeX to display)
     * @param name         Name of the vector
+    * @param folder       GUI parent folder of the vector
     * @param defaultValue Default [x, y] value of the input (default [0, 0])
     * @param minValue     Minimum [x, y] value of the input (default [0, 0])
     * @param maxValue     Maximum [x, y] value of the input (default [10, 10])
-    * @return A function that returns the current value of the vector
+    * @return A function that returns the current value of the vector as an array [x, y]
     */
-    addVector(name, defaultValue = [0, 0], minValue = [0, 0], maxValue = [10, 10]) {
-        this.addFolder(name, this.datas.configuration, 'vector_' + name);
-        this.addInput('x', defaultValue[0], minValue[0], maxValue[0], this.datas.configuration['vector_' + name]);
-        this.addInput('y', defaultValue[1], minValue[1], maxValue[1], this.datas.configuration['vector_' + name]);
-
-        return () => new Vector(
-            this.datas.configuration['vector_' + name]._values['x'],
-            this.datas.configuration['vector_' + name]._values['y']
-        );
+    addVector(name, folder, defaultValue = [0, 0], minValue = [0, 0], maxValue = [10, 10]) {
+        let fol = this.addFolder(name, folder);
+        this.addInput('x', fol, defaultValue[0], minValue[0], maxValue[0]);
+        this.addInput('y', fol, defaultValue[1], minValue[1], maxValue[1]);
+        return () => [fol._values['x'], fol._values['y']];
     }
 
 
