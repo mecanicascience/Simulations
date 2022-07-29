@@ -86,8 +86,8 @@ fn computeEnergy(sp : u32, coords : vec2<f32>) -> f32 {
     // Sum over 4 neighbor (periodic conditions)
     return -j * s * atomS * (f32(spinAt(coords.x, coords.y + 1)) * 2.0 - 1.0)
            -j * s * atomS * (f32(spinAt(coords.x, coords.y - 1)) * 2.0 - 1.0)
-           -j * s * atomS * (f32(spinAt(coords.x + 1, coords.y)) * 2.0 - 1.0)
-           -j * s * atomS * (f32(spinAt(coords.x - 1, coords.y)) * 2.0 - 1.0);
+           -j * s * atomS * (f32(spinAt(coords.x + 1.0, coords.y)) * 2.0 - 1.0)
+           -j * s * atomS * (f32(spinAt(coords.x - 1.0, coords.y)) * 2.0 - 1.0);
 }
 
 
