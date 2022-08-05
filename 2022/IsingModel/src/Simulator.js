@@ -18,7 +18,7 @@ class Simulator {
         // Set GUI
         this.gui = new OptionsGuiAPI('Ising model', 'The <c>Ising model</c> is a physics modelisation of magnetism inside matter, using the Metropolis algorithm.');
         let folPhysics = this.gui.addFolder('Physics');
-        this.temperature = this.gui.addInput('$$T$$', folPhysics, 2, 0, 10, 0.001, '<c>Temperature</c> of the grid.'); 
+        this.temperature = this.gui.addInput('$$T$$', folPhysics, 4, 0, 10, 0.001, '<c>Temperature</c> of the grid.'); 
         this.spin = this.gui.addInput("$$|s|$$", folPhysics, 1, 0, 5, 0.001, 'Module of the particles <c>spin</c>.');
         this.couplingConst = this.gui.addInput("$$J$$", folPhysics, 1, 0, 5, 0.001, 'Module of the <c>coupling constant</c> in the Hamiltonian.');
 
