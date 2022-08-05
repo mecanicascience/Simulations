@@ -1,0 +1,295 @@
+/* %%%% Global %%%%% */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.options {
+    margin: 0;
+    color: white;
+    font-family: "Segoe UI", Arial, sans-serif !important;
+    transition: transform 0.5s ease-in-out;
+    transform: translateX(0px);
+}
+
+.options-icon {
+    position: fixed;
+    top: 9px;
+    font-size: 32px;
+    left: 8px;
+    transform: translateX(296px);
+    background-color: #232323;
+    padding: 6px 8px 6px 8px;
+    border-radius: 5px;
+    transition: transform 0.5s ease-in-out;
+}
+/* %%%%%%%%%%%%%%%%% */
+
+
+/* %%%% Parameters box %%%% */
+.options > hr {
+    width: 90%;
+    border-radius: 6px;
+    border: solid white 1px;
+}
+
+.op-container {
+    display: flex;
+    position: fixed;
+    top: 0;
+    height: 100%;
+    width: fit-content;
+    max-width: 280px;
+    flex-direction: column;
+    background-color: #232323;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 16px 8px 0 8px;
+    text-align: center;
+    color: white;
+}
+
+.op-title {
+    font-size: 28px;
+    font-weight: 100;
+    padding: 3px 13px 3px 17px;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 4px;
+}
+
+.op-title-t {
+    flex-grow: 1;
+    text-transform: uppercase;
+}
+
+.op-title-b {
+    flex-grow: 0.2;
+    font-size: 18px;
+    position: relative;
+    top: 21%;
+    color: #b8d6ff;
+}
+
+/* %%%%%%%%%%%%%%%%%%%%%%%% */
+
+
+/* %%%% Tooltip %%%% */
+.data-tooltip-cont::before {
+    content: '';
+    position: fixed;
+    border-width: 0 5px 7px 5px;
+    border-style: solid;
+    border-color: transparent transparent #b8d6ff transparent;
+    top: -1px;
+    left: 47%;
+    transform: translateY(-8px);
+}
+
+.data-tooltip-cont {
+    position: absolute;
+    z-index: 2;
+    top: 30px;
+    left: 50%;
+    padding: 11px;
+    transform: translateX(-50%) scale(0);
+    transition: transform 0.3s ease-in-out;
+    transform-origin: top;
+    background: #232323;
+    border: solid #b8d6ff 3px;
+    text-align: justify;
+    font-size: 13px;
+    font-family: Roboto, sans-serif;
+    color: #f2f2f2;
+    font-weight: 100;
+    width: 650%;
+    border-radius: 9px;
+}
+
+.data-tooltip-marker:hover>.data-tooltip-cont {
+    transform: translateX(-50%) scale(1);
+}
+
+.data-tooltip-cont>c {
+    color: #b8d6ff;
+    transition: color 0.2s ease-in-out;
+}
+
+.data-tooltip-cont>c:hover {
+    color: #95c0fd;
+}
+
+/* %%%%%%%%%%%%%%%%% */
+
+
+/* %%%% Elements %%%% */
+.op-descr {
+    font-size: 14px;
+    font-weight: 100;
+    color: #d1d1d1;
+    text-align: justify;
+    padding: 4px 8px;
+}
+
+.op-folder {
+    background-color: #323232;
+    padding: 5px 5px 10px 5px;
+    margin: 11px 3px 20px 3px;
+    border-radius: 7px;
+}
+
+.op-folder>hr {
+    width: 89%;
+    border-radius: 3px;
+    border: solid #8f8f8f 0.5px;
+}
+
+.op-f-title {
+    text-transform: uppercase;
+    font-size: 18px;
+    color: white;
+    padding-top: 5px;
+    margin-bottom: 6px;
+}
+
+.op-f-elements {
+    text-align: left;
+}
+
+.op-f-el {
+    display: flex;
+    flex-direction: row;
+}
+
+.op-f-el>div {
+    flex-grow: 1;
+}
+
+.op-f-el-t {
+    width: 55px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 15px;
+    min-height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 9px 0 4px;
+    color: #e5e5e5;
+}
+
+.op-f-el-mod {
+    display: flex;
+    flex-direction: row;
+}
+
+.op-el-range-slider {
+    flex-grow: 3;
+    width: 100%;
+    height: 3px;
+    margin: auto 0;
+    overflow: visible;
+    accent-color: #b8d6ff;
+    border: 0;
+    outline: none;
+}
+
+.op-el-range-value {
+    flex-grow: 1;
+    border: 0;
+    text-align: center;
+    font-size: 12px;
+    height: 16px;
+    outline: none;
+    font-weight: 100;
+    padding: 4px;
+    background-color: #2c2c2c;
+    color: #d2d2d2;
+    transition: background-color 0.3s ease-in-out;
+    margin: auto 2px auto 5px;
+    max-width: 35px;
+}
+
+.op-el-range-value:hover,
+.op-el-range-value:focus {
+    background-color: #232323;
+}
+
+.op-f-el-b {
+    width: 100%;
+    border: solid #b8d6ff 2px;
+    background-color: transparent;
+    color: #e5e5e5;
+    border-radius: 9px;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: 14px;
+    height: 25px;
+    margin: 9px 2px 0 2px;
+}
+
+.op-f-el-b:hover {
+    background-color: #b8d6ff;
+    color: white;
+}
+
+.op-f-el-b:active {
+    transition: background-color 0.1s ease-out;
+    background-color: #91bfff;
+    color: white;
+}
+
+.op-el-range-hint {
+    font-size: 14px;
+    position: relative;
+    top: 6%;
+    left: -4%;
+    color: #b7b7b7;
+    height: fit-content;
+    margin-right: -13px;
+}
+
+/* %%%%%%%%%%%%%%%%%%%% */
+
+/* %%%% Footer %%%% */
+.op-footer {
+    position: fixed;
+    left: 42px;
+    bottom: 25px;
+}
+
+.op-footer-text {
+    color: #797979;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.op-footer-text>c {
+    transition: color 0.2s ease-in-out;
+}
+
+.op-footer-text>c:hover {
+    color: #626262;
+}
+
+.op-footer-icons>a {
+    color: #797979;
+    transition: color 0.2s ease-in-out;
+    margin: 0 4px;
+}
+
+.op-footer-icons>a:hover {
+    color: #626262;
+}
+/* %%%%%%%%%%%%%%%% */

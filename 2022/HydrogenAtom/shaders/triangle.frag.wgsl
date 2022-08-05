@@ -1,10 +1,10 @@
 // Simulation buffer
 struct Parameters {
-    n : f32;
-    l : f32;
-    m : f32;
-    opacityFactor : f32;
-    Z : f32;
+    n : f32,
+    l : f32,
+    m : f32,
+    opacityFactor : f32,
+    Z : f32
 }
 @group(0) @binding(0) var<uniform> parameters: Parameters;
 

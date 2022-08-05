@@ -44,17 +44,17 @@ async function startProgram() {
 
 async function loadGUI() {
     this.params = {};
-    this.optionsGUI = new OptionsGUI();
-    this.optionsGUI.addFolder('\\text{Paramètres}', 'root', 'parameters');
-    
-    this.optionsGUI.addFolder('\\text{Configuration}', this.optionsGUI.datas.parameters, 'config');
-    this.params.opacity = this.optionsGUI.addInput("\\text{Opacité}", 12.0, 0.1, 500, this.optionsGUI.datas.parameters.config, 0.1);
-    this.params.Z = this.optionsGUI.addInput("\\text{Numéro atomique} Z", 1, 1, 10, this.optionsGUI.datas.parameters.config, 1);
+    this.optionsGUI = new OptionsGuiAPI("Hydrogen atom", "Simulation of the wavefunction of the <c>Hydrogen Atom orbitals</c>.");
 
-    this.optionsGUI.addFolder('\\text{Nombre quantiques}', this.optionsGUI.datas.parameters, 'quantum_numbers');
-    this.params.n = this.optionsGUI.addInput("n", 4, 0, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
-    this.params.l = this.optionsGUI.addInput("l", 1, 0, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
-    this.params.m = this.optionsGUI.addInput("m", -1, -10, 10, this.optionsGUI.datas.parameters.quantum_numbers, 1);
+    let numbers = this.optionsGUI.addFolder('Quantum number');
+    this.params.n = this.optionsGUI.addInput("$$n$$", numbers, 4, 0, 10, 1, '<c>Principal</c> Quantum Number.');
+    this.params.l = this.optionsGUI.addInput("$$l$$", numbers, 1, 0, 10, 1, '<c>Angular Momentum</c> Quantum Number.');
+    this.params.m = this.optionsGUI.addInput("$$m$$", numbers, -1, -10, 10, 1, '<c>Magnetic</c> Quantum Number.');
+    
+    let config = this.optionsGUI.addFolder('Configuration');
+    this.params.opacity = this.optionsGUI.addInput("Opacity", config, 12.0, 0.1, 500, 0.01);
+    this.params.Z = this.optionsGUI.addInput("Atomic Number", config, 1, 1, 10, 1);
+    this.optionsGUI.processMaths();
 }
 
 
