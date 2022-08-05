@@ -1,3 +1,4 @@
+// COMPUTE NEXT FRAME FOR ISING MODEL
 // ==== Spins grid data ====
 struct GridSpins {
     points : array<u32>

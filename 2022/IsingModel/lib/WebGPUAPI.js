@@ -501,24 +501,32 @@ class WebGPUAPI {
 	createBuffer(arr, usage) {
 		// Align to 4 bytes
 		let size = (arr.byteLength + 3) & ~3;
-		if (arr instanceof Uint32Array)
+		if (arr instanceof Uint32Array || arr instanceof Int32Array)
 			size = arr.byteLength;
 		let desc = { size: size, usage, mappedAtCreation: true };
 		let buffer = this.device.createBuffer(desc);
 
 		let writeArray;
 		let type;
-		if (arr instanceof Uint32Array) {
-			writeArray = new Uint32Array(buffer.getMappedRange());
-			type = 'uint32';
-		}
-		else if (arr instanceof Float32Array) {
+		if (arr instanceof Float32Array) {
 			writeArray = new Float32Array(buffer.getMappedRange());
 			type = 'float32';
 		}
 		else if (arr instanceof Uint16Array) {
 			writeArray = new Uint16Array(buffer.getMappedRange());
 			type = 'uint16';
+		}
+		else if (arr instanceof Uint32Array) {
+			writeArray = new Uint32Array(buffer.getMappedRange());
+			type = 'uint32';
+		}
+		else if (arr instanceof Int16Array) {
+			writeArray = new Int16Array(buffer.getMappedRange());
+			type = 'int16';
+		}
+		else if (arr instanceof Int32Array) {
+			writeArray = new Int32Array(buffer.getMappedRange());
+			type = 'int32';
 		}
 		writeArray.set(arr);
 		buffer.unmap();
@@ -582,11 +590,15 @@ class WebGPUAPI {
 
 		// Display values
 		await gpuReadBuffer.mapAsync(GPUMapMode.READ);
-		if (buffer.type == "uint32")
-			return new Uint32Array(gpuReadBuffer.getMappedRange());
-		else if (buffer.type == "float32")
+		if (buffer.type == "float32")
 			return new Float32Array(gpuReadBuffer.getMappedRange());
 		else if (buffer.type == "uint16")
 			return new Uint16Array(gpuReadBuffer.getMappedRange());
+		else if (buffer.type == "uint32")
+			return new Uint32Array(gpuReadBuffer.getMappedRange());
+		else if (buffer.type == "int16")
+			return new Int16Array(gpuReadBuffer.getMappedRange());
+		else if (buffer.type == "int32")
+			return new Int32Array(gpuReadBuffer.getMappedRange());
 	}
 }
