@@ -88,7 +88,7 @@ body {
 .data-tooltip-cont::before {
     content: '';
     position: fixed;
-    border-width: 0 5px 9px 5px;
+    border-width: 0 5px 7px 5px;
     border-style: solid;
     border-color: transparent transparent #b8d6ff transparent;
     top: -1px;
