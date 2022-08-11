@@ -14,6 +14,7 @@ class Simulator {
 
         // Set initialize
         this.initialized = false;
+        this.lastWall = Date.now();
     }
 
     async initialize() {
@@ -33,7 +34,7 @@ class Simulator {
         // Drawing mode
         let drawFol = this.gui.addFolder('Add elements');
         this.pencilMode = this.gui.addSelect('Draw mode', drawFol, ['None', 'Sources', 'Walls'], 'None', 'Right click to <c>draw sources or walls</c> if selected');
-        this.wallDrawRadius = this.gui.addInput('Wall Stencil Radius', drawFol, 5, 1, 15, 0.1);
+        this.wallDrawRadius = this.gui.addInput('Wall Stencil Radius', drawFol, 10, 1, 20, 0.1);
         this.gui.addButton('Reset', drawFol, () => {
             this.sources = [ 0.0 ];
             this.api.updateBuffer(this.computeData.sources, new Float32Array(this.maxSourcesCount * 4));
@@ -85,7 +86,7 @@ class Simulator {
             gridData: this.api.createBuffer(new Float32Array([this.canvas.width, this.canvas.height, deltat, deltax, deltay]), GPUBufferUsage.UNIFORM),
             physData: this.api.createBuffer(new Float32Array([this.conductivity(), this.density(), this.capacity()]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
             // Wall buffer
-            wallData: this.api.createBuffer(new Uint32Array(this.maxWallsCount + 2), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST)
+            wallData: this.api.createBuffer(new Uint32Array(this.maxWallsCount * 3 + 2), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST)
         };
         this.newWalls = [];
         this.drawCounter = 0;
@@ -295,15 +296,18 @@ class Simulator {
         // Draw Walls
         if (this.newWalls.length != 0 && this.drawCounter >= this.drawWallTickCount) {
             // Set walls buffer
-            let arr = new Uint32Array(this.maxWallsCount + 2);
-            arr.set([this.wallDrawRadius(), this.newWalls.length]);
+            let arr = new Uint32Array(this.maxWallsCount * 3 + 2);
+            arr.set([this.wallDrawRadius(), this.newWalls.length / 3.0]);
             arr.set(this.newWalls, 2);
             this.api.updateBuffer(this.computeData.wallData, arr);
 
             // Draw walls
-            this.computeWalls.run(Math.ceil(this.newWalls.length / 256.0));
+            this.computeWalls.run(Math.ceil(this.newWalls.length / 3.0 / 256.0));
 
             // Reset
+            let newData = [];
+            if (this.newWalls.length >= 3)
+                newData = [this.newWalls[this.newWalls.length - 3], this.newWalls[this.newWalls.length - 2], this.newWalls[this.newWalls.length - 1]];
             this.newWalls = [];
             this.drawCounter = 0;
         }
@@ -345,8 +349,9 @@ class Simulator {
 
         // Add walls to draw list
         if (this.pencilMode() == 'Walls' && this.mouseStatus == 'down' && this.mousePos[0] >= 0 && this.mousePos[0] <= 1 && this.mousePos[1] >= 0 && this.mousePos[1] <= 1) {
-            let id = Math.round(this.mousePos[0] * this.canvas.width + this.mousePos[1] * this.canvas.height * this.canvas.width);
-            this.newWalls.push(id);
+            this.newWalls.push(Math.round(this.mousePos[0] * this.canvas.width));
+            this.newWalls.push(Math.round(this.mousePos[1] * this.canvas.height));
+            this.newWalls.push(Math.round(Date.now()));
         }
     }
 }
