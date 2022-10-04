@@ -3,7 +3,7 @@ async function startProgram() {
     // Add loading GPU module
     const otMeta = document.createElement('meta');
     otMeta.httpEquiv = 'origin-trial';
-    otMeta.content = 'AmuZWablDld33xMJcfEiPlfHNGLwljmCzpZzCJj5kwgDYGU5ODvXK/6nTOJFLJuLusomNtFkSu44q7kVO+zncAEAAABxeyJvcmlnaW4iOiJodHRwczovL3NpbXVsYXRpb25zLm1lY2FuaWNhc2NpZW5jZS5mcjo0NDMiLCJmZWF0dXJlIjoiV2ViR1BVIiwiZXhwaXJ5IjoxNjYzNzE4Mzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=';
+    otMeta.content = 'AgtVEPtAKd4ArDYyercRNdboSUW3PN5JArCvCbT9JHWAzx/LzGhZjNJycDqr8o7NfNRfNFS5EPbTkw6eO1Q/ZgUAAABxeyJvcmlnaW4iOiJodHRwczovL3NpbXVsYXRpb25zLm1lY2FuaWNhc2NpZW5jZS5mcjo0NDMiLCJmZWF0dXJlIjoiV2ViR1BVIiwiZXhwaXJ5IjoxNjc1MjA5NTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=';
     document.head.append(otMeta);
 
     // Create program
