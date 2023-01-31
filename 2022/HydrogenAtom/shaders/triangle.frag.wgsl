@@ -9,10 +9,6 @@ struct Parameters {
 @group(0) @binding(0) var<uniform> parameters: Parameters;
 
 
-// System varants
-var pi : f32 = 3.141592653;
-
-
 // Global methods
 fn factorial(x : i32) -> i32 {
     // Convention
@@ -121,6 +117,7 @@ fn Y(theta : f32, phi : f32, l : i32, m : i32) -> f32 {
     }
 
     // Normalization
+    var pi = 3.141592653;
     var normalizationFac = sqrt(
         f32(2*l + 1)
         * f32(factorial(l - abs(m)))
