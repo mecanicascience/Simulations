@@ -9,8 +9,8 @@ struct Parameters {
 @group(0) @binding(0) var<uniform> parameters: Parameters;
 
 
-// System constants
-const pi : f32 = 3.141592653;
+// System varants
+var pi : f32 = 3.141592653;
 
 
 // Global methods
@@ -51,8 +51,8 @@ fn factorial(x : i32) -> i32 {
 
 // YLM
 fn associatedLegendre(theta : f32, l : i32, m : i32) -> f32 {
-    const cosTheta = cos(theta);
-    const sinTheta = sin(theta);
+    var cosTheta = cos(theta);
+    var sinTheta = sin(theta);
     if (l == 0) {
         if (m == 0) {
             return 1.0;
@@ -121,7 +121,7 @@ fn Y(theta : f32, phi : f32, l : i32, m : i32) -> f32 {
     }
 
     // Normalization
-    const normalizationFac = sqrt(
+    var normalizationFac = sqrt(
         f32(2*l + 1)
         * f32(factorial(l - abs(m)))
         / (4.0 * pi)
@@ -162,7 +162,7 @@ fn laguerreGeneralises(x : f32, n : i32, l : i32) -> f32 {
 }
 
 fn R(r : f32, n : i32, l : i32, Z : f32) -> f32 {
-    const normalizationFac = sqrt(
+    var normalizationFac = sqrt(
           pow(2.0 * Z / f32(n), 3.0)
         * f32(factorial(n - l - 1))
         / (2.0 * f32(n) * f32(factorial(n + l)))
@@ -180,9 +180,9 @@ fn R(r : f32, n : i32, l : i32, Z : f32) -> f32 {
 // At (x, y, z)
 fn atomPsi(pos : vec3<f32>, n : i32, l : i32, m : i32, Z : f32) -> f32 {
     // Polar coordinates
-    const r = sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
-    const theta = atan2(pos.z, r);
-    const phi = atan2(pos.y, pos.x);
+    var r = sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+    var theta = atan2(pos.z, r);
+    var phi = atan2(pos.y, pos.x);
 
     // Hydrogen atom density probability
     return R(r, n, l, Z) * Y(theta, phi, l, m);
@@ -190,42 +190,42 @@ fn atomPsi(pos : vec3<f32>, n : i32, l : i32, m : i32, Z : f32) -> f32 {
 
 
 fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
-    // Constants
-    const n = i32(parameters.n);
-    const l = i32(parameters.l);
-    const m = i32(parameters.m);
-    const opacityFactor = parameters.opacityFactor;
-    const Z = parameters.Z;
+    // varants
+    var n = i32(parameters.n);
+    var l = i32(parameters.l);
+    var m = i32(parameters.m);
+    var opacityFactor = parameters.opacityFactor;
+    var Z = parameters.Z;
 
     // Screen viewing boundaries
-    const xRange = vec2(-20.0, 20.0);
-    const yRange = vec2(-20.0, 20.0);
+    var xRange = vec2(-20.0, 20.0);
+    var yRange = vec2(-20.0, 20.0);
 
     // Compute point position based on camera (TODO)
-    const iPos = vec3<f32>(
+    var iPos = vec3<f32>(
         pos.x * (xRange.y - xRange.x) + xRange.x,
         0.0,
         pos.y * (yRange.y - yRange.x) + yRange.x
     );
 
     // Compute vector to center
-    const vecToCenter = vec3<f32>(0.0, 1.0, 0.0);
+    var vecToCenter = vec3<f32>(0.0, 1.0, 0.0);
 
     // Number of planes to compute the wavefunction sum
-    const RES_PLANE_COUNTS = 100;
+    var RES_PLANE_COUNTS = 100;
     // Area to sum over each wavefunction
-    const RES_PLANE_AREA = 5;
+    var RES_PLANE_AREA = 5;
 
     // Sum over each planes
     var proba = 0.0;
     var color = vec3<f32>(0.0, 0.0, 0.0);
     for (var i: i32 = 0; i < RES_PLANE_COUNTS; i = i + 1) {
         // Pos
-        const relPos = iPos + vecToCenter * sqrt(iPos.x*iPos.x + iPos.y*iPos.y + iPos.z*iPos.z) // shift to center
+        var relPos = iPos + vecToCenter * sqrt(iPos.x*iPos.x + iPos.y*iPos.y + iPos.z*iPos.z) // shift to center
                     + vecToCenter * (f32(i) / f32(RES_PLANE_COUNTS) * f32(RES_PLANE_AREA * 2) - f32(RES_PLANE_AREA));
 
         // Wave function
-        const psi = atomPsi(relPos, n, l, m, Z);
+        var psi = atomPsi(relPos, n, l, m, Z);
         var colorLoc = vec3<f32>(255.0, 201.0, 102.0) / 255.0;
         if (psi < 0.0) {
             colorLoc = vec3<f32>(105.0, 189.0, 218.0) / 255.0;
@@ -234,8 +234,8 @@ fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
         proba = proba + psi * psi;
     }
     
-    const opacity = min(1.0, max(0.0, proba / f32(RES_PLANE_COUNTS)));
-    const computedColor = color / f32(RES_PLANE_COUNTS) * opacity * opacityFactor;
+    var opacity = min(1.0, max(0.0, proba / f32(RES_PLANE_COUNTS)));
+    var computedColor = color / f32(RES_PLANE_COUNTS) * opacity * opacityFactor;
     return vec3(min(computedColor.r, 1.0), min(computedColor.g, 1.0), min(computedColor.b, 1.0));
 }
 
