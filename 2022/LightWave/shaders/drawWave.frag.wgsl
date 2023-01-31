@@ -9,7 +9,7 @@ struct GridConfig {
 };
 @group(1) @binding(0) var<uniform> inGridConfig : GridConfig;
 
-@stage(fragment)
+@fragment
 fn main(@location(0) inUv : vec2<f32>) -> @location(0) vec4<f32> {
     // Coords
     var coords = vec2<f32>(floor(inUv.x * inGridConfig.size.x), floor(inUv.y * inGridConfig.size.y));

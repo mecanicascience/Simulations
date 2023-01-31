@@ -20,7 +20,7 @@ struct PhysSources {
 @group(0) @binding(3) var<storage, read> inSourcesData : PhysSources;
 
 
-@stage(compute) @workgroup_size(256)
+@compute @workgroup_size(256)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     if (global_id.x >= inSourcesData.wallsCount) {
         return;

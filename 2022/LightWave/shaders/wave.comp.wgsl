@@ -30,7 +30,7 @@ struct SinWaveConfig {
 
 
 
-@stage(compute) @workgroup_size(16, 16)
+@compute @workgroup_size(16, 16)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     var x = i32(global_id.x);
     var y = i32(global_id.y);

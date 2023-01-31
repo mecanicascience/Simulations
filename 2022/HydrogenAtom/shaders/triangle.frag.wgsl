@@ -240,7 +240,7 @@ fn probabilityColorAt(pos : vec2<f32>) -> vec3<f32> {
 }
 
 
-@stage(fragment)
+@fragment
 fn main(@location(0) inPos : vec2<f32>) -> @location(0) vec4<f32> {
     return vec4<f32>(probabilityColorAt(inPos), 1.0);
 }

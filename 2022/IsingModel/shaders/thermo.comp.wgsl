@@ -14,7 +14,7 @@ struct GridData {
 // ==== Simulation ====
 struct PhysData {
     temperature : f32,
-    spin : f32,
+    magField : f32,
     couplingConst : f32
 };
 @group(1) @binding(0) var<uniform> inPhysicsData : PhysData;
@@ -26,7 +26,7 @@ struct ThermoValues {
 @group(1) @binding(1) var<storage, read_write> inThermoValues : ThermoValues;
 
 
-@stage(compute) @workgroup_size(16, 16)
+@compute @workgroup_size(16, 16)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let coords = vec2<f32>(f32(global_id.x), f32(global_id.y));
     if (coords.x >= inGridData.size.x || coords.y >= inGridData.size.y) {
@@ -43,15 +43,17 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 fn computeEnergy(coords: vec2<f32>) {
     // Grid and atom values
     let atomS = f32(spinAt(coords.x, coords.y)) * 2.0 - 1.0;
-    let s = inPhysicsData.spin;
     let j = inPhysicsData.couplingConst;
 
     // Sum over 4 neighbor (periodic conditions)
-    let E = -j * s * atomS * (f32(spinAt(coords.x, coords.y + 1.0)) * 2.0 - 1.0)
-            -j * s * atomS * (f32(spinAt(coords.x, coords.y - 1.0)) * 2.0 - 1.0)
-            -j * s * atomS * (f32(spinAt(coords.x + 1.0, coords.y)) * 2.0 - 1.0)
-            -j * s * atomS * (f32(spinAt(coords.x - 1.0, coords.y)) * 2.0 - 1.0);
-    atomicAdd(&inThermoValues.energy, i32(round(E)));
+    var E = -j * atomS * (
+              f32(spinAt(coords.x, coords.y + 1.0)) * 2.0 - 1.0
+            + f32(spinAt(coords.x, coords.y - 1.0)) * 2.0 - 1.0
+            + f32(spinAt(coords.x + 1.0, coords.y)) * 2.0 - 1.0
+            + f32(spinAt(coords.x - 1.0, coords.y)) * 2.0 - 1.0
+    );
+    E += -atomS * inPhysicsData.magField;
+    
 }
 
 fn computeSpin(coords: vec2<f32>) {

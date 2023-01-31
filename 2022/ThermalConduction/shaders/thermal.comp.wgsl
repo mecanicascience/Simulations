@@ -26,7 +26,7 @@ struct PhysSources {
 @group(0) @binding(4) var<storage, read> inSourcesData : PhysSources;
 
 
-@stage(compute) @workgroup_size(16, 16)
+@compute @workgroup_size(16, 16)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     var coords = vec2<f32>(f32(global_id.x), f32(global_id.y));
     if (coords.x >= inGridData.size.x || coords.y >= inGridData.size.y) {

@@ -10,7 +10,7 @@ struct GridData {
 @group(0) @binding(1) var<uniform> inGridData : GridData;
 
 
-@stage(fragment)
+@fragment
 fn main(@location(0) inUv : vec2<f32>) -> @location(0) vec4<f32> {
     let coords = vec2<f32>(floor(inUv.x * inGridData.size.x), floor(inUv.y * inGridData.size.y));
     let sign = inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)];

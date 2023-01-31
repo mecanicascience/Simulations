@@ -25,7 +25,7 @@ struct GridColor {
 @group(0) @binding(3) var<storage, read> inColors : GridColor;
 
 
-@stage(fragment)
+@fragment
 fn main(@location(0) inUv : vec2<f32>) -> @location(0) vec4<f32> {
     // Coords
     var coords = vec2<f32>(floor(inUv.x * inGridData.size.x), floor(inUv.y * inGridData.size.y));

@@ -4,7 +4,7 @@ struct VSOut {
 };
 
 
-@stage(vertex)
+@vertex
 fn main(@location(0) inPos: vec3<f32>, // from (-1 = left, -1 = bottom) to (1 = right, 1 = top)
         @location(1) inColor: vec3<f32>) -> VSOut {
     var vsOut : VSOut;

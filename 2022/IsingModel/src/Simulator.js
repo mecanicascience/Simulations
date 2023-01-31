@@ -18,12 +18,12 @@ class Simulator {
         // Set GUI
         this.gui = new OptionsGuiAPI('Ising model', 'The <c>Ising model</c> is a physics modelisation of magnetism inside matter, using the Metropolis algorithm.');
         let folPhysics = this.gui.addFolder('Physics');
-        this.temperature = this.gui.addInput('$$T$$', folPhysics, 4, 0, 10, 0.001, '<c>Temperature</c> of the grid.'); 
-        this.spin = this.gui.addInput("$$|s|$$", folPhysics, 1, 0, 5, 0.001, 'Module of the particles <c>spin</c>.');
+        this.temperature = this.gui.addInput('$$k_B T$$', folPhysics, 4, 0, 10, 0.001, '<c>Heat energy</c> of the grid.'); 
+        this.magField = this.gui.addInput("$$h$$", folPhysics, 0, -1.1/4, 1.1/4, 0.001, 'Value of <c>magnetic field</c>.');
         this.couplingConst = this.gui.addInput("$$J$$", folPhysics, 1, 0, 5, 0.001, 'Module of the <c>coupling constant</c> in the Hamiltonian.');
 
         let folConfig = this.gui.addFolder("Configuration");
-        this.runCountByTick = this.gui.addInput("Simulation speed", folConfig, 1, 1, 100, 1); // Numbers of spins flipped each tick
+        this.runCountByTick = this.gui.addInput("Simulation speed", folConfig, 1, 0, 100, 1); // Numbers of spins flipped each tick
         this.maxSize = 4000;
         this.size = this.gui.addInput("Grid size", folConfig, 1000, 2, this.maxSize, 1);
         this.gui.addButton("Reset simulation", folConfig, () => {
@@ -38,6 +38,11 @@ class Simulator {
         this.stepsCount = -1;
         this.stepDisplayed = -100;
         this.frameID = 0;
+        this.dataCount = 0;
+        this.ESquared = 0;
+        this.E = 0;
+        this.magnetization = 0;
+        this.thCapacity = 0;
 
         
         // ===== DATA STORAGE =====
@@ -48,7 +53,7 @@ class Simulator {
         };
         this.physicsData = {
             simValues: this.api.createBuffer(new Float32Array([0, 0, 1, 1, 0]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
-            physData: this.api.createBuffer(new Float32Array([this.temperature(), this.spin(), this.couplingConst()]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
+            physData: this.api.createBuffer(new Float32Array([this.temperature(), this.magField(), this.couplingConst()]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
             thermoQuantities: this.api.createBuffer(new Int32Array([0, 0]), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST)
         };
 
@@ -107,35 +112,8 @@ class Simulator {
                         bufferAccess: "uniform",
                         buffer: this.physicsData.physData
                     }
-                ]
-            ]
-        });
-
-        // Create thermo quantities compute pipeline
-        this.thermoComputePipeline = await this.api.createComputePipeline({
-            shader: { type: "comp", src: "shaders/thermo.comp.wgsl" },
-            layouts: [
-                [
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.COMPUTE,
-                        bufferAccess: "read-only-storage",
-                        buffer: this.spinsData.spinsBuffer
-                    },
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.COMPUTE,
-                        bufferAccess: "uniform",
-                        buffer: this.spinsData.spinsData
-                    }
                 ],
                 [
-                    {
-                        type: "buffer",
-                        visibility: GPUShaderStage.COMPUTE,
-                        bufferAccess: "uniform",
-                        buffer: this.physicsData.physData
-                    },
                     {
                         type: "buffer",
                         visibility: GPUShaderStage.COMPUTE,
@@ -148,8 +126,8 @@ class Simulator {
         
 
         // ===== SET INITIAL DATA =====
-        // let randomSpins = new Uint32Array(this.maxSize * this.maxSize).map(() => Math.round(Math.random())); // Random spins
-        let randomSpins = new Uint32Array(this.maxSize * this.maxSize).fill(0); // All spins up
+        let randomSpins = new Uint32Array(this.maxSize * this.maxSize).map(() => Math.round(Math.random())); // Random spins
+        // let randomSpins = new Uint32Array(this.maxSize * this.maxSize).fill(0); // All spins up
         this.api.updateBuffer(this.spinsData.spinsBuffer, randomSpins);
     }
 
@@ -158,7 +136,7 @@ class Simulator {
         this.api.tick();
 
         // Update gui values
-        this.api.updateBuffer(this.physicsData.physData, new Float32Array([this.temperature(), this.spin(), this.couplingConst()]));
+        this.api.updateBuffer(this.physicsData.physData, new Float32Array([this.temperature(), this.magField(), this.couplingConst()]));
 
         if (this.size() != this.lastSize) {
             // Check size
@@ -167,8 +145,8 @@ class Simulator {
             this.api.updateBuffer(this.spinsData.spinsData, new Float32Array([this.gridSize[0], this.gridSize[1]]));
 
             // Reset spins
-            //let randomSpins = new Uint32Array(this.maxSize * this.maxSize).map(() => Math.round(Math.random())); // Random spins
-            let randomSpins = new Uint32Array(this.maxSize * this.maxSize).fill(0); // All spins up
+            let randomSpins = new Uint32Array(this.maxSize * this.maxSize).map(() => Math.round(Math.random())); // Random spins
+            // let randomSpins = new Uint32Array(this.maxSize * this.maxSize).fill(0); // All spins up
             this.api.updateBuffer(this.spinsData.spinsBuffer, randomSpins);
         }
 
@@ -177,14 +155,22 @@ class Simulator {
         
         // Display grid
         this.graphicsPipeline.run();
+
+        // Fetch thermo quantities
+        this.fetchThermoQuantities();
+
+        // Output values
+        // console.log("Average energy", this.E);
+        console.log("Average magnetization", this.magnetization);
+        // console.log("Average thermal capacity", this.thCapacity);
     }
 
     runCompute() {
         // Run compute shader
         for (let i = 0; i < this.runCountByTick(); i++) {
             // Update random values
-            let translVectorRand = [Math.round(Math.random() * 1000000) / 10000, Math.round(Math.random() * 1000000) / 10000];
-            let scaleVectorRand = [Math.round(Math.random() * 1000000) / 300000 + 1, Math.round(Math.random() * 100000) / 300000 + 1];
+            let translVectorRand = [Math.round(Math.random() * 1000000) / 100000, Math.round(Math.random() * 1000000) / 100000];
+            let scaleVectorRand = [Math.round(Math.random() * 1000000) / 3000000 + 1, Math.round(Math.random() * 100000) / 3000000 + 1];
             this.frameID = (this.frameID + 1) % 2;
             this.api.updateBuffer(this.physicsData.simValues, new Float32Array([
                 translVectorRand[0], translVectorRand[1],
@@ -197,34 +183,18 @@ class Simulator {
         }
     }
 
-    async computeThermoQuantities(readFramesCount = 200) {
-        // Read the values for the next N frames
-        let E = 0;
-        let ESquared = 0;
-        let magnetization = 0;
-        for (let i = 0; i < readFramesCount; i++) {
-            // Run compute shader
-            simulation.runCompute();
+    async fetchThermoQuantities() {
+        // Read data
+        let data = await this.api.readBuffer(this.physicsData.thermoQuantities);
 
-            // Reset data buffer
-            this.api.updateBuffer(this.physicsData.thermoQuantities, new Int32Array([0, 0]));
+        // Extract thermo quantities
+        this.E = data[0] / (this.gridSize[0] * this.gridSize[1]);
+        this.magnetization = data[1] / (this.gridSize[0] * this.gridSize[1]);
+        this.ESquared = (this.ESquared * this.dataCount + this.E * this.E) / (this.dataCount + 1);
+        this.thCapacity = (this.ESquared - this.E * this.E) / (this.temperature() * this.temperature());
+        this.dataCount++;
 
-            // Run compute pipeline
-            this.thermoComputePipeline.run(Math.ceil(this.gridSize[0] / 16.0), Math.ceil(this.gridSize[1] / 16.0));
-
-            // Read data
-            let data = await this.api.readBuffer(this.physicsData.thermoQuantities);
-            let newE = 0.5 * data[0] / (this.gridSize[0] * this.gridSize[1]);
-            E = (E * i + newE) / (i + 1);
-            ESquared = (ESquared * i + newE * newE) / (i + 1);
-            magnetization = (magnetization * i + 0.5 * data[1] / (this.gridSize[0] * this.gridSize[1])) / (i + 1);
-        }
-        let thCapacity = (ESquared - E * E) / (this.temperature() * this.temperature());
-
-        // Output values
-        console.log("Average energy", E);
-        console.log("Average magnetization", magnetization);
-        console.log("Average thermal capacity", thCapacity);
-        return [E, magnetization, thCapacity];
+        // Reset data buffer
+        this.api.updateBuffer(this.physicsData.thermoQuantities, new Int32Array([0, 0]));
     }
 }

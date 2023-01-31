@@ -21,14 +21,22 @@ struct SimulationValues {
 
 struct PhysData {
     temperature : f32,
-    spin : f32,
+    magField : f32,
     couplingConst : f32
 };
 @group(1) @binding(1) var<uniform> inPhysicsData : PhysData;
 
 
+// === Thermo measures ===
+struct ThermoValues {
+    energy : atomic<i32>,
+    magnetization : atomic<i32>
+};
+@group(2) @binding(0) var<storage, read_write> inThermoValues : ThermoValues;
 
-@stage(compute) @workgroup_size(16, 16)
+
+
+@compute @workgroup_size(16, 16)
 fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     let coords = vec2<f32>(f32(global_id.x), f32(global_id.y));
     if (coords.x >= inGridData.size.x || coords.y >= inGridData.size.y) {
@@ -45,25 +53,33 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         || (coords.y % 2.0 == 1.0 && coords.x % 2.0 == 0.0)
     )) { return; }
 
+    // Should update thermo quantities
+    let computeThermo = true;
+
     // Set spin by running the algorithm
-    inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)] = metropolis(coords);
+    inGridSpins.points[i32(coords.x + coords.y * inGridData.size.x)] = metropolis(coords, computeThermo);
 }
 
 
 
 // ======== PHYSICS ========
 // Check if the spin should be inverted using the Metropolis algorithm
-fn metropolis(coords : vec2<f32>) -> u32 {
+fn metropolis(coords : vec2<f32>, computeThermo : bool) -> u32 {
     var sp = spinAt(coords.x, coords.y);
 
     // Compute old and new energies
-	let oldE = 2.0 * computeEnergy(sp, coords);
+	let oldE = 2.0 * computeEnergy(sp, coords, computeThermo);
     if (sp == 0u) { sp = 1u; } else { sp = 0u; } // Invert spin
-	let newE = 2.0 * computeEnergy(sp, coords);
+	let newE = -oldE;
 
     // Run Metropolis algorithm
 	let deltaE = newE - oldE;
-    if (deltaE < 0.0) { // DeltaE < 0 : Change accepted
+    if (deltaE <= 0.0) { // DeltaE <= 0 : Change accepted
+        // Add value to thermo computing quantities
+        if (computeThermo) {
+            atomicAdd(&inThermoValues.energy, i32(round(newE)));
+            atomicAdd(&inThermoValues.magnetization, i32(round(f32(sp) * 2.0 - 1.0)));
+        }
         return sp;
     }
 
@@ -71,6 +87,11 @@ fn metropolis(coords : vec2<f32>) -> u32 {
     let invertProba = randFast(coords);
     let beta = 1.0 / inPhysicsData.temperature;
     if (invertProba <= exp(-beta * deltaE)) {
+        // Add value to thermo computing quantities
+        if (computeThermo) {
+            atomicAdd(&inThermoValues.energy, i32(round(newE)));
+            atomicAdd(&inThermoValues.magnetization, i32(round(f32(sp) * 2.0 - 1.0)));
+        }
         return sp; // Change accepted
     }
     if (sp == 0u) { sp = 1u; } else { sp = 0u; } // Change refused
@@ -78,17 +99,22 @@ fn metropolis(coords : vec2<f32>) -> u32 {
 }
 
 // Compute the energy given by the atom and given it's spin sp
-fn computeEnergy(sp : u32, coords : vec2<f32>) -> f32 {
+fn computeEnergy(sp : u32, coords : vec2<f32>, computeThermo : bool) -> f32 {
     // Grid and atom values
     let atomS = f32(sp) * 2.0 - 1.0;
-    let s = inPhysicsData.spin;
     let j = inPhysicsData.couplingConst;
 
     // Sum over 4 neighbor (periodic conditions)
-    return -j * s * atomS * (f32(spinAt(coords.x, coords.y + 1.0)) * 2.0 - 1.0)
-           -j * s * atomS * (f32(spinAt(coords.x, coords.y - 1.0)) * 2.0 - 1.0)
-           -j * s * atomS * (f32(spinAt(coords.x + 1.0, coords.y)) * 2.0 - 1.0)
-           -j * s * atomS * (f32(spinAt(coords.x - 1.0, coords.y)) * 2.0 - 1.0);
+    var en = -j * atomS * (
+              f32(spinAt(coords.x, coords.y + 1.0)) * 2.0 - 1.0
+            + f32(spinAt(coords.x, coords.y - 1.0)) * 2.0 - 1.0
+            + f32(spinAt(coords.x + 1.0, coords.y)) * 2.0 - 1.0
+            + f32(spinAt(coords.x - 1.0, coords.y)) * 2.0 - 1.0
+    );
+
+    // Add field energy
+    en += -inPhysicsData.magField * atomS;
+    return en;
 }
 
 
