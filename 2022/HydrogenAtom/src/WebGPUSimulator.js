@@ -1,6 +1,6 @@
 class WebGPUSimulator {
 	constructor(canvas) {
-		this._debug = true;
+		this._debug = false;
 
 		this.canvas = { html : canvas };
 		this.graphicsPipeline = { shaders : {} };
