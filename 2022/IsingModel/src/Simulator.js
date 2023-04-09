@@ -52,7 +52,7 @@ class Simulator {
             spinsData: this.api.createBuffer(new Float32Array([this.gridSize[0], this.gridSize[1]]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST)
         };
         this.physicsData = {
-            simValues: this.api.createBuffer(new Float32Array([0, 0, 1, 1, 0]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
+            simValues: this.api.createBuffer(new Float32Array([0, 0, 1, 1, 0, 0]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
             physData: this.api.createBuffer(new Float32Array([this.temperature(), this.magField(), this.couplingConst()]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
             thermoQuantities: this.api.createBuffer(new Int32Array([0, 0]), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST)
         };
@@ -157,11 +157,11 @@ class Simulator {
         this.graphicsPipeline.run();
 
         // Fetch thermo quantities
-        this.fetchThermoQuantities();
+        // this.fetchThermoQuantities();
 
         // Output values
         // console.log("Average energy", this.E);
-        console.log("Average magnetization", this.magnetization);
+        // console.log("Average magnetization", this.magnetization);
         // console.log("Average thermal capacity", this.thCapacity);
     }
 
@@ -175,7 +175,7 @@ class Simulator {
             this.api.updateBuffer(this.physicsData.simValues, new Float32Array([
                 translVectorRand[0], translVectorRand[1],
                 scaleVectorRand[0], scaleVectorRand[1],
-                this.frameID
+                this.frameID, 0
             ]));
 
             // Run compute pipeline
