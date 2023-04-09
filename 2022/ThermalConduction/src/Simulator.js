@@ -83,8 +83,8 @@ class Simulator {
             gridColors: this.api.createBuffer(new Float32Array(colors), GPUBufferUsage.STORAGE),
             sources: this.api.createBuffer(initSources, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST),
             // Physics parameters
-            gridData: this.api.createBuffer(new Float32Array([this.canvas.width, this.canvas.height, deltat, deltax, deltay]), GPUBufferUsage.UNIFORM),
-            physData: this.api.createBuffer(new Float32Array([this.conductivity(), this.density(), this.capacity()]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
+            gridData: this.api.createBuffer(new Float32Array([this.canvas.width, this.canvas.height, deltat, deltax, deltay, 0, 0]), GPUBufferUsage.UNIFORM),
+            physData: this.api.createBuffer(new Float32Array([this.conductivity(), this.density(), this.capacity(), 0, 0, 0, 0]), GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST),
             // Wall buffer
             wallData: this.api.createBuffer(new Uint32Array(this.maxWallsCount * 3 + 2), GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST)
         };
@@ -279,7 +279,7 @@ class Simulator {
         this.api.tick();
 
         // Update data
-        this.api.updateBuffer(this.computeData.physData, new Float32Array([this.conductivity(), this.density(), this.capacity()]));
+        this.api.updateBuffer(this.computeData.physData, new Float32Array([this.conductivity(), this.density(), this.capacity(), 0, 0, 0, 0]));
         
         // Heat equation
         for (let i = 0; i < this.stepsPerTick; i++) {

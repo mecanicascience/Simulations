@@ -348,7 +348,7 @@ class WebGPUAPI {
 	 * Create a compute pipeline
 	 * @param config The pipeline configuration
 	 *  {
-	 *      shader : {
+	 *      shaders : {
 	 *          type : "comp"
 	 *          src : "shaders/-.comp.wgsl"
 	 *      },
@@ -503,6 +503,8 @@ class WebGPUAPI {
 		let size = (arr.byteLength + 3) & ~3;
 		if (arr instanceof Uint32Array || arr instanceof Int32Array)
 			size = arr.byteLength;
+        if (arr instanceof Float32Array && size <= 24)
+            console.error("The buffer size is too small to be mapped.");
 		let desc = { size: size, usage, mappedAtCreation: true };
 		let buffer = this.device.createBuffer(desc);
 
